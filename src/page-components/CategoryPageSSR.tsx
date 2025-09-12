@@ -284,9 +284,11 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
           <header className="mb-4 border-b pb-4 w-full">
             {/* Center Content */}
             <div className="text-center mb-4">
-              <h1 className="text-4xl md:text-5xl font-serif font-extrabold tracking-tight text-[#708238] dark:text-zinc-50 mb-6">
-              {subcategory ? subcategory.name : category.name}
-            </h1>
+              <Link href="/" className="inline-block">
+                <h1 className="text-4xl md:text-5xl font-serif font-extrabold tracking-tight text-[#708238] dark:text-zinc-50 mb-6 hover:opacity-80 transition-opacity cursor-pointer">
+                Spread The Word
+              </h1>
+              </Link>
             </div>
             
             {/* Date and Search Bar Row */}
@@ -332,21 +334,20 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
                 <NavigationMenu>
                   <NavigationMenuList className="flex-nowrap gap-2 min-w-max">
                     <NavigationMenuItem>
-                      <Link
-                        href="/"
+                      <span
                         className={
-                          'px-4 py-2 rounded-md text-sm font-medium transition-colors bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50 hover:bg-[#708238] dark:hover:bg-[#708238] whitespace-nowrap inline-block'
+                          'px-4 py-2 rounded-md text-sm font-medium transition-colors bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50 whitespace-nowrap inline-block cursor-default'
                         }
-                        prefetch={true}
                       >
-                        Tout
-                      </Link>
+                        {subcategory ? subcategory.name : category.name}
+                      </span>
                     </NavigationMenuItem>
                     {subcategories.map(subcat => (
                       <NavigationMenuItem key={subcat._id}>
                         <Link
                           href={`/${category.slug}/${subcat.slug}`}
-                          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap inline-block ${subcategorySlug === subcat.slug ? 'bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-900' : 'bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}
+                          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap inline-block ${subcategorySlug === subcat.slug ? 'text-white' : 'bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}
+                          style={subcategorySlug === subcat.slug ? {backgroundColor: '#708238'} : {}}
                           prefetch={true}
                         >
                           {subcat.name}
@@ -865,4 +866,4 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
       </div>
     </div>
   );
-} 
+}

@@ -201,7 +201,7 @@ export function PostView({ slug: propSlug }: PostViewProps = {}) {
           <header className="mb-4 border-b pb-4 text-center relative">
             <h1 className="text-4xl md:text-5xl font-serif font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 mb-6">
             <Link href="/" className="hover:opacity-80 transition-opacity cursor-pointer">
-                Spread The Word
+                Handicap International
               </Link>
             </h1>
             <div className="text-zinc-500 dark:text-zinc-400 text-sm">{new Date(post.createdAt).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
@@ -413,7 +413,7 @@ export function PostView({ slug: propSlug }: PostViewProps = {}) {
                       <img
                         src={extractFirstImage(news.content) || placeholderImg}
                         alt={news.title}
-                        className="w-20 h-16 object-cover rounded border flex-shrink-0"
+                        className="w-20 h-20 object-cover rounded border flex-shrink-0"
                         loading="lazy"
                       />
                       <div className="flex-1 min-w-0">
@@ -470,4 +470,4 @@ function getExcerptFromContent(html: string, wordCount = 15): string {
   tmp.innerHTML = html;
   const text = tmp.textContent || tmp.innerText || '';
   return text.split(/\s+/).slice(0, wordCount).join(' ') + (text.split(/\s+/).length > wordCount ? '...' : '');
-} 
+}

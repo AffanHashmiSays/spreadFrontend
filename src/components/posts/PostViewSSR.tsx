@@ -19,6 +19,20 @@ import { AdPlaceholder } from '../ui/AdPlaceholder';
 import * as cheerio from 'cheerio';
 import PostContent from './PostContent';
 
+// Helper to strip HTML and get excerpt
+function getExcerptFromContent(html: string, wordCount = 15): string {
+  if (!html) return '';
+  // First, strip all HTML tags completely to avoid partial tags
+  const text = html
+    .replace(/<[^>]*>/g, '') // Remove complete HTML tags
+    .replace(/&[^;]+;/g, ' ') // Replace HTML entities with spaces
+    .replace(/\s+/g, ' ') // Normalize whitespace
+    .trim();
+  
+  const words = text.split(/\s+/).filter(word => word.length > 0);
+  return words.slice(0, wordCount).join(' ') + (words.length > wordCount ? '...' : '');
+}
+
 interface PostViewSSRProps {
   initialData: {
     post: any;
@@ -118,7 +132,11 @@ export function PostViewSSR({ initialData }: PostViewSSRProps) {
   };
 
   // Always show latest news from any category
-  const latestNewsPosts = [...posts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 8);
+  const latestNewsPosts = [...posts].sort((a, b) => {
+    const dateA = new Date(a.publishedAt || a.createdAt).getTime();
+    const dateB = new Date(b.publishedAt || b.createdAt).getTime();
+    return dateB - dateA;
+  }).slice(0, 8);
 
   // Find current category and subcategory objects
   const currentCategory = categories.find((c: any) => c.slug === categorySlug && c.parentId === null);
@@ -162,7 +180,11 @@ export function PostViewSSR({ initialData }: PostViewSSRProps) {
           (p._id !== post?._id && p.id !== post?.id) &&
           p.categoryIds.some((cat: any) => (cat._id || cat.id) === currentSubcategory._id)
       )
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .sort((a, b) => {
+        const dateA = new Date(a.publishedAt || a.createdAt).getTime();
+        const dateB = new Date(b.publishedAt || b.createdAt).getTime();
+        return dateB - dateA;
+      })
       .slice(0, 5);
   } else if (currentCategory) {
     upNextPosts = posts
@@ -171,12 +193,20 @@ export function PostViewSSR({ initialData }: PostViewSSRProps) {
           (p._id !== post?._id && p.id !== post?.id) &&
           p.categoryIds.some((cat: any) => (cat._id || cat.id) === currentCategory._id)
       )
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .sort((a, b) => {
+        const dateA = new Date(a.publishedAt || a.createdAt).getTime();
+        const dateB = new Date(b.publishedAt || b.createdAt).getTime();
+        return dateB - dateA;
+      })
       .slice(0, 5);
   } else {
     upNextPosts = posts
       .filter((p) => (p._id !== post?._id && p.id !== post?.id))
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .sort((a, b) => {
+        const dateA = new Date(a.publishedAt || a.createdAt).getTime();
+        const dateB = new Date(b.publishedAt || b.createdAt).getTime();
+        return dateB - dateA;
+      })
       .slice(0, 5);
   }
 
@@ -187,6 +217,15 @@ export function PostViewSSR({ initialData }: PostViewSSRProps) {
   }
 
   function getPostImage(post: any): string | null {
+    // Priority: metaImage -> featured image -> first image from image_urls -> content image
+    if (post.metaImage) {
+      return post.metaImage;
+    }
+    
+    if (post.featured_image) {
+      return post.featured_image;
+    }
+    
     // Use image_urls array if available
     if (Array.isArray(post.image_urls) && post.image_urls.length > 0) {
       return post.image_urls[0];
@@ -197,14 +236,30 @@ export function PostViewSSR({ initialData }: PostViewSSRProps) {
   }
 
   function getPostImageWithFallbacks(post: any): string[] {
-    // Return all available image URLs for fallback
+    const fallbacks = [];
+    
+    // Add metaImage as primary fallback
+    if (post.metaImage) {
+      fallbacks.push(post.metaImage);
+    }
+    
+    // Add featured image as secondary fallback
+    if (post.featured_image) {
+      fallbacks.push(post.featured_image);
+    }
+    
+    // Add image URLs array
     if (Array.isArray(post.image_urls) && post.image_urls.length > 0) {
-      return post.image_urls;
+      fallbacks.push(...post.image_urls);
     }
     
     // Fallback to content image
     const contentImage = extractFirstImage(post.content);
-    return contentImage ? [contentImage] : [];
+    if (contentImage) {
+      fallbacks.push(contentImage);
+    }
+    
+    return fallbacks.length > 0 ? fallbacks : [];
   }
 
   const handleImageError = (postId: string) => {
@@ -245,9 +300,9 @@ export function PostViewSSR({ initialData }: PostViewSSRProps) {
             {/* Login/Dashboard Button - Top Right */}
             
             
-            <h1 className="text-4xl md:text-5xl font-serif font-extrabold tracking-tight text-[#708238] dark:text-[#708238] mb-6">
-            <Link href="/" className="hover:opacity-80 transition-opacity cursor-pointer">
-                Spread The Word
+            <h1 className="text-4xl md:text-5xl font-serif font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 mb-6">
+            <Link href="/" className="hover:opacity-80 transition-opacity cursor-pointer" style={{color: '#708238'}}>
+                Spread The World
               </Link>
             </h1>
             <div className="text-zinc-500 dark:text-zinc-400 text-sm"><FormattedDate dateString={post.createdAt} /></div>
@@ -259,7 +314,7 @@ export function PostViewSSR({ initialData }: PostViewSSRProps) {
             {showLeftArrow && (
               <button
                 onClick={scrollLeft}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white dark:bg-[#708238] border border-gray-300 dark:border-gray-600 rounded-full p-2 shadow-lg hover:bg-[#708238] transition-all hover:scale-105 md:hidden"
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-full p-2 shadow-lg hover:shadow-xl transition-all hover:scale-105 md:hidden"
                 aria-label="Scroll left"
               >
                 <ChevronLeft className="h-4 w-4 text-gray-700 dark:text-gray-300" />
@@ -310,12 +365,12 @@ export function PostViewSSR({ initialData }: PostViewSSRProps) {
                         <NavigationMenuItem key={category._id}>
                           <Link
                             href={`/${category.slug}`}
-                           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap inline-block ${
-  isActive 
-    ? 'bg-[#708238] text-white'   // ✅ Selected category in green
-    : 'bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800'
-}`}
-
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap inline-block ${
+                              isActive 
+                                ? 'text-white' 
+                                : 'bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                            }`}
+                            style={isActive ? {backgroundColor: '#708238'} : {}}
                             prefetch={true}
                           >
                             {category.name}
@@ -336,10 +391,10 @@ export function PostViewSSR({ initialData }: PostViewSSRProps) {
                 <h1 className="text-3xl font-bold mb-2">{post.title}</h1>
                 <div className="text-gray-500 mb-4">
                   {post.authorId?.name && <span>By {post.authorId.name} | </span>}
-                  <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                  <FormattedDate dateString={post.createdAt} />
                 </div>
                 <div className="prose prose-lg dark:prose-invert max-w-none mx-auto">
-                  <PostContent content={processedHtml} headings={headings} />
+                  <PostContent content={processedHtml} headings={headings} relatedPosts={upNextPosts} />
                 </div>
                 {/* Tags */}
                 {post.tagIds && post.tagIds.length > 0 && (
@@ -375,10 +430,10 @@ export function PostViewSSR({ initialData }: PostViewSSRProps) {
                             {upNextPost.title}
                           </Link>
                           <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                            {new Date(upNextPost.createdAt).toLocaleDateString()}
+                            <FormattedDate dateString={upNextPost.publishedAt || upNextPost.createdAt} />
                           </div>
                           <div className="text-xs text-gray-500 line-clamp-2">
-                            {upNextPost.excerpt || 'En savoir plus sur ce sujet...'}
+                            {getExcerptFromContent(upNextPost.content || upNextPost.excerpt, 15) || 'En savoir plus sur ce sujet...'}
                           </div>
                         </div>
                       </div>
@@ -400,8 +455,8 @@ export function PostViewSSR({ initialData }: PostViewSSRProps) {
                         <LazyImage
                           src={getPostImage(latestPost)!}
                           alt={latestPost.title}
-                          className="w-16 h-16 object-cover rounded flex-shrink-0"
-                          aspectRatio="1/1"
+                          className="w-16 h-20 object-cover rounded flex-shrink-0"
+                          aspectRatio="4/5"
                           imageUrls={getPostImageWithFallbacks(latestPost)}
                           onError={() => handleImageError(latestPost.id)}
                         />
@@ -411,10 +466,10 @@ export function PostViewSSR({ initialData }: PostViewSSRProps) {
                           {latestPost.title}
                         </Link>
                         <div className="text-xs text-gray-500 mb-1">
-                          {new Date(latestPost.createdAt).toLocaleDateString()}
+                          <FormattedDate dateString={latestPost.publishedAt || latestPost.createdAt} />
                         </div>
                         <div className="text-xs text-gray-400 line-clamp-1">
-                          {latestPost.excerpt || 'Dernière mise à jour des nouvelles...'}
+                          {getExcerptFromContent(latestPost.content || latestPost.excerpt, 15) || 'Dernière mise à jour des nouvelles...'}
                         </div>
                       </div>
                     </div>
@@ -435,4 +490,4 @@ export function PostViewSSR({ initialData }: PostViewSSRProps) {
       </div>
     </div>
   );
-} 
+}
