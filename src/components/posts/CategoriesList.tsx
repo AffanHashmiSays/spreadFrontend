@@ -139,13 +139,13 @@ export function CategoriesList() {
   // Delete category
   const handleDelete = async (id: string) => {
     const hasSubcategories = categories.some(c => c.parentId === id);
-    if (hasSubcategories && !window.confirm('This category has subcategories. Are you sure you want to delete it?')) return;
-    if (!window.confirm('Delete this category?')) return;
+    if (hasSubcategories && !window.confirm('Cette catégorie a des sous-catégories. Êtes-vous sûr de vouloir la supprimer ?')) return;
+    if (!window.confirm('Supprimer cette catégorie ?')) return;
     try {
       await api.delete(`/categories/${id}`, token || undefined);
       setCategories(categories.filter(c => c._id !== id));
     } catch (err) {
-      setError('Failed to delete category');
+      setError('Échec de la suppression de la catégorie');
     }
   };
 
@@ -193,7 +193,7 @@ export function CategoriesList() {
       );
 
       if (hasSubcategories) {
-        const confirmMessage = 'Some selected categories have subcategories. Deleting them will also delete their subcategories. Continue?';
+        const confirmMessage = 'Certaines catégories sélectionnées ont des sous-catégories. Les supprimer supprimera également leurs sous-catégories. Continuer ?';
         if (!window.confirm(confirmMessage)) {
           setBulkActionLoading(false);
           return;
@@ -241,13 +241,13 @@ export function CategoriesList() {
                   value={editParentId || ''}
                   onChange={e => setEditParentId(e.target.value || null)}
                 >
-                  <option value="">Top-level</option>
+                  <option value="">Niveau supérieur</option>
                   {categories.filter(c => c._id !== cat._id).map(c => (
                     <option key={c._id} value={c._id}>{c.name}</option>
                   ))}
                 </select>
-                <Button type="submit" size="sm">Save</Button>
-                <Button type="button" size="sm" variant="outline" onClick={() => setEditingId(null)}>Cancel</Button>
+                <Button type="submit" size="sm">Sauvegarder</Button>
+                <Button type="button" size="sm" variant="outline" onClick={() => setEditingId(null)}>Annuler</Button>
               </form>
             </TableCell>
           ) : (
@@ -278,10 +278,10 @@ export function CategoriesList() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => handleEdit(cat)}>
-                      <Edit className="mr-2 h-4 w-4" />Edit
+                      <Edit className="mr-2 h-4 w-4" />Modifier
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleDelete(cat._id)}>
-                      <Trash2 className="mr-2 h-4 w-4" />Delete
+                      <Trash2 className="mr-2 h-4 w-4" />Supprimer
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -326,8 +326,8 @@ export function CategoriesList() {
                 ))}
               </select>
               <div className="flex gap-2">
-                <Button type="submit" size="sm" className="flex-1">Save</Button>
-                <Button type="button" size="sm" variant="outline" onClick={() => setEditingId(null)} className="flex-1">Cancel</Button>
+                <Button type="submit" size="sm" className="flex-1">Sauvegarder</Button>
+                <Button type="button" size="sm" variant="outline" onClick={() => setEditingId(null)} className="flex-1">Annuler</Button>
               </div>
             </form>
           ) : (
@@ -352,10 +352,10 @@ export function CategoriesList() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => handleEdit(cat)}>
-                      <Edit className="mr-2 h-4 w-4" />Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDelete(cat._id)}>
-                      <Trash2 className="mr-2 h-4 w-4" />Delete
+                  <Edit className="mr-2 h-4 w-4" />Modifier
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleDelete(cat._id)}>
+                  <Trash2 className="mr-2 h-4 w-4" />Supprimer
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -397,7 +397,7 @@ export function CategoriesList() {
             <Input 
               value={name} 
               onChange={e => setName(e.target.value)} 
-              placeholder="Category Name" 
+              placeholder="Nom de la catégorie" 
               required 
               className="w-full lg:flex-1"
             />
@@ -420,7 +420,7 @@ export function CategoriesList() {
             </select>
           </div>
           <Button type="submit" className="w-full lg:w-auto">
-            <Plus size={16} className="mr-2" />Add
+            <Plus size={16} className="mr-2" />Ajouter
           </Button>
         </form>
 
@@ -441,18 +441,18 @@ export function CategoriesList() {
                 className="w-full sm:w-auto"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                {bulkActionLoading ? 'Deleting...' : 'Delete'}
+                {bulkActionLoading ? 'Suppression...' : 'Supprimer'}
               </Button>
             </div>
           </div>
         )}
 
         {loading ? (
-          <div className="flex justify-center p-8">Loading categories...</div>
+          <div className="flex justify-center p-8">Chargement des catégories...</div>
         ) : tree.length === 0 ? (
           <div className="text-center p-8 border rounded-md">
-            <h3 className="mt-2 text-sm font-semibold text-gray-900">No categories found</h3>
-            <p className="mt-1 text-sm text-gray-500">Get started by creating a new category</p>
+            <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucune catégorie trouvée</h3>
+            <p className="mt-1 text-sm text-gray-500">Commencez par créer une nouvelle catégorie</p>
           </div>
         ) : (
           <>
@@ -489,23 +489,23 @@ export function CategoriesList() {
       <AlertDialog open={bulkDeleteModalOpen} onOpenChange={setBulkDeleteModalOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Multiple Categories</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete {selectedCategories.length} categor{selectedCategories.length > 1 ? 'ies' : 'y'}? This action cannot be undone and will permanently remove all selected categories and their subcategories from the system.
-            </AlertDialogDescription>
+            <AlertDialogTitle>Supprimer Plusieurs Catégories</AlertDialogTitle>
+          <AlertDialogDescription>
+            Êtes-vous sûr de vouloir supprimer {selectedCategories.length} catégorie{selectedCategories.length > 1 ? 's' : ''} ? Cette action ne peut pas être annulée et supprimera définitivement toutes les catégories sélectionnées et leurs sous-catégories du système.
+          </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleBulkDelete}
-              className="bg-red-600 hover:bg-red-700"
-              disabled={bulkActionLoading}
-            >
-              {bulkActionLoading ? 'Deleting...' : `Delete ${selectedCategories.length} Categor${selectedCategories.length > 1 ? 'ies' : 'y'}`}
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleBulkDelete}
+            className="bg-red-600 hover:bg-red-700"
+            disabled={bulkActionLoading}
+          >
+            {bulkActionLoading ? 'Suppression...' : `Supprimer ${selectedCategories.length} Catégorie${selectedCategories.length > 1 ? 's' : ''}`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </Card>
   );
-} 
+}

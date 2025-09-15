@@ -58,11 +58,11 @@ export default function PaymentSuccess() {
         {processing
           ? 'Please wait while we verify your payment.'
           : success === true
-            ? 'Your balance has been updated. Redirecting...'
-            : 'You were unable to complete the payment. Please try again or contact support.'}
+            ? 'Votre solde a été mis à jour. Redirection...'
+            : 'Vous n\'avez pas pu finaliser le paiement. Veuillez réessayer ou contacter le support.'}
       </p>
       {error && <div className="text-red-500">{error}</div>}
-      <Button onClick={() => router.push('/dashboard/balance')}>Go to Balance</Button>
+      <Button onClick={() => router.push('/dashboard/balance')}>Aller au Solde</Button>
     </div>
   );
-} 
+}

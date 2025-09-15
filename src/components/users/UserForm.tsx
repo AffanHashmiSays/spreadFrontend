@@ -133,7 +133,7 @@ export function UserForm() {
   };
   
   if (loading) {
-    return <div className="flex justify-center p-8">Loading user...</div>;
+    return <div className="flex justify-center p-8">Chargement de l'utilisateur...</div>;
   }
   
   function buildCategoryTree(
@@ -158,11 +158,11 @@ export function UserForm() {
     <form onSubmit={handleSubmit}>
       <Card>
         <CardHeader>
-          <CardTitle>{isNewUser ? 'Create New User' : 'Edit User'}</CardTitle>
+          <CardTitle>{isNewUser ? 'Créer un nouvel utilisateur' : 'Modifier l'utilisateur'}</CardTitle>
           <CardDescription>
             {isNewUser 
-              ? 'Fill in the details to create a new user account' 
-              : 'Update user account details'}
+              ? 'Remplissez les détails pour créer un nouveau compte utilisateur' 
+              : 'Mettre à jour les détails du compte utilisateur'}
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
@@ -174,12 +174,12 @@ export function UserForm() {
             )}
             
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Nom</Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="User's full name"
+                placeholder="Nom complet de l'utilisateur"
                 required
               />
             </div>
@@ -191,26 +191,26 @@ export function UserForm() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="user@example.com"
+                placeholder="utilisateur@exemple.com"
                 required
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
+              <Label htmlFor="role">Rôle</Label>
               <Select
                 value={role}
                 onValueChange={(value) => setRole(value as UserRole)}
               >
                 <SelectTrigger id="role">
-                  <SelectValue placeholder="Select role" />
+                  <SelectValue placeholder="Sélectionner un rôle" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ADMIN">Admin</SelectItem>
-                  <SelectItem value="EDITOR">Editor</SelectItem>
-                  <SelectItem value="PUBLISHER">Publisher</SelectItem>
-                  <SelectItem value="AUTHOR">Author</SelectItem>
-                  <SelectItem value="USER">User</SelectItem>
+                  <SelectItem value="ADMIN">Administrateur</SelectItem>
+                  <SelectItem value="EDITOR">Éditeur</SelectItem>
+                  <SelectItem value="PUBLISHER">Éditeur</SelectItem>
+                  <SelectItem value="AUTHOR">Auteur</SelectItem>
+                  <SelectItem value="USER">Utilisateur</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -218,7 +218,7 @@ export function UserForm() {
             {isNewUser && (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">Mot de passe</Label>
                   <Input
                     id="password"
                     type="password"
@@ -230,7 +230,7 @@ export function UserForm() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
                   <Input
                     id="confirmPassword"
                     type="password"
@@ -247,7 +247,7 @@ export function UserForm() {
             {(role === 'EDITOR' || role === 'AUTHOR' || role === 'PUBLISHER') && (
               <>
                 <div className="space-y-2">
-                  <Label>Assign Categories/Subcategories</Label>
+                  <Label>Assigner des catégories/sous-catégories</Label>
                   <div className="border rounded-lg bg-white dark:bg-zinc-900 p-4 max-h-64 overflow-y-auto">
                     {buildCategoryTree(categories).map(cat => (
                       <div key={cat._id} className="mb-2">
@@ -283,12 +283,12 @@ export function UserForm() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>Assign Tags</Label>
+                  <Label>Assigner des tags</Label>
                   <MultiSelect
                     options={tags.map((tag: any) => ({ value: tag.id || tag._id, label: tag.name }))}
                     value={assignedTagIds}
                     onChange={setAssignedTagIds}
-                    placeholder="Select tags"
+                    placeholder="Sélectionner des tags"
                   />
                 </div>
               </>
@@ -301,10 +301,10 @@ export function UserForm() {
             variant="outline" 
             onClick={() => router.push('/dashboard/users')}
           >
-            Cancel
+            Annuler
           </Button>
           <Button type="submit" disabled={saving}>
-            {saving ? 'Saving...' : 'Save User'}
+            {saving ? 'Sauvegarde...' : 'Sauvegarder l'utilisateur'}
           </Button>
         </CardFooter>
       </Card>

@@ -109,12 +109,12 @@ export function TagsList() {
       const data = await api.get('/tags', token || undefined);
       setTags(data);
       toast({
-        title: 'Success',
-        description: response?.message || 'Tag updated successfully!',
+        title: 'Succès',
+        description: response?.message || 'Tag mis à jour avec succès !',
         variant: 'default',
       });
     } catch (err: any) {
-      let errorMsg = 'Failed to update tag';
+      let errorMsg = 'Échec de la mise à jour du tag';
       if (typeof err === 'string') {
         try {
           const parsed = JSON.parse(err);
@@ -141,19 +141,19 @@ export function TagsList() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Delete this tag?')) return;
+    if (!window.confirm('Supprimer ce tag ?')) return;
     try {
       await api.delete(`/tags/${id}`, token || undefined);
       setTags(tags.filter(t => (t.id || t._id) !== id));
       toast({
-        title: "Success",
-        description: "Tag deleted successfully",
+        title: "Succès",
+        description: "Tag supprimé avec succès",
       });
     } catch (err) {
-      setError('Failed to delete tag');
+      setError('Échec de la suppression du tag');
       toast({
-        title: "Error",
-        description: "Failed to delete tag",
+        title: "Erreur",
+        description: "Échec de la suppression du tag",
         variant: "destructive",
       });
     }
@@ -203,14 +203,14 @@ export function TagsList() {
       setBulkDeleteModalOpen(false);
 
       toast({
-        title: "Success",
-        description: `${selectedTags.length} tag${selectedTags.length > 1 ? 's' : ''} deleted successfully`,
+        title: "Succès",
+        description: `${selectedTags.length} tag${selectedTags.length > 1 ? 's' : ''} supprimé${selectedTags.length > 1 ? 's' : ''} avec succès`,
       });
     } catch (err) {
       console.error('Error deleting tags:', err);
       toast({
-        title: "Error",
-        description: "Failed to delete some tags",
+        title: "Erreur",
+        description: "Échec de la suppression de certains tags",
         variant: "destructive",
       });
     } finally {
@@ -232,7 +232,7 @@ export function TagsList() {
             <Input 
               value={name} 
               onChange={e => setName(e.target.value)} 
-              placeholder="Tag Name" 
+              placeholder="Nom du tag" 
               required 
               className="w-full lg:flex-1"
             />
@@ -245,7 +245,7 @@ export function TagsList() {
             />
           </div>
           <Button type="submit" className="w-full lg:w-auto">
-            <Plus size={16} className="mr-2" />Add
+            <Plus size={16} className="mr-2" />Ajouter
           </Button>
         </form>
 
@@ -254,7 +254,7 @@ export function TagsList() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-blue-50 border border-blue-200 rounded-md mb-4 gap-3">
             <div className="flex items-center space-x-2">
               <span className="text-sm font-medium text-blue-900">
-                {selectedTags.length} tag{selectedTags.length > 1 ? 's' : ''} selected
+                {selectedTags.length} tag{selectedTags.length > 1 ? 's' : ''} sélectionné{selectedTags.length > 1 ? 's' : ''}
               </span>
             </div>
             <div className="flex items-center space-x-2">
@@ -266,18 +266,18 @@ export function TagsList() {
                 className="w-full sm:w-auto"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                {bulkActionLoading ? 'Deleting...' : 'Delete'}
+                {bulkActionLoading ? 'Suppression...' : 'Supprimer'}
               </Button>
             </div>
           </div>
         )}
 
         {loading ? (
-          <div className="flex justify-center p-8">Loading tags...</div>
+          <div className="flex justify-center p-8">Chargement des tags...</div>
         ) : tags.length === 0 ? (
           <div className="text-center p-8 border rounded-md">
-            <h3 className="mt-2 text-sm font-semibold text-gray-900">No tags found</h3>
-            <p className="mt-1 text-sm text-gray-500">Get started by creating a new tag</p>
+            <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucun tag trouvé</h3>
+            <p className="mt-1 text-sm text-gray-500">Commencez par créer un nouveau tag</p>
           </div>
         ) : (
           <>
@@ -292,7 +292,7 @@ export function TagsList() {
                         onCheckedChange={handleSelectAll}
                       />
                     </TableHead>
-                    <TableHead>Name</TableHead>
+                    <TableHead>Nom</TableHead>
                     <TableHead>Slug</TableHead>
                     <TableHead className="w-[100px]">Actions</TableHead>
                   </TableRow>
@@ -305,8 +305,8 @@ export function TagsList() {
                           <form onSubmit={handleUpdate} className="flex gap-2 w-full">
                             <Input value={editName} onChange={e => setEditName(e.target.value)} required />
                             <Input value={editSlug} onChange={e => setEditSlug(e.target.value)} required />
-                            <Button type="submit" size="sm">Save</Button>
-                            <Button type="button" size="sm" variant="outline" onClick={() => setEditingId(null)}>Cancel</Button>
+                            <Button type="submit" size="sm">Sauvegarder</Button>
+                            <Button type="button" size="sm" variant="outline" onClick={() => setEditingId(null)}>Annuler</Button>
                           </form>
                         </TableCell>
                       ) : (
@@ -328,10 +328,10 @@ export function TagsList() {
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={() => handleEdit(tag)}>
-                                  <Edit className="mr-2 h-4 w-4" />Edit
+                                  <Edit className="mr-2 h-4 w-4" />Modifier
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => handleDelete(tag.id || tag._id || '')}>
-                                  <Trash2 className="mr-2 h-4 w-4" />Delete
+                                  <Trash2 className="mr-2 h-4 w-4" />Supprimer
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -354,7 +354,7 @@ export function TagsList() {
                         value={editName} 
                         onChange={e => setEditName(e.target.value)} 
                         required 
-                        placeholder="Tag Name"
+                        placeholder="Nom du tag"
                         className="w-full"
                       />
                       <Input 
@@ -365,8 +365,8 @@ export function TagsList() {
                         className="w-full"
                       />
                       <div className="flex gap-2">
-                        <Button type="submit" size="sm" className="flex-1">Save</Button>
-                        <Button type="button" size="sm" variant="outline" onClick={() => setEditingId(null)} className="flex-1">Cancel</Button>
+                        <Button type="submit" size="sm" className="flex-1">Sauvegarder</Button>
+                        <Button type="button" size="sm" variant="outline" onClick={() => setEditingId(null)} className="flex-1">Annuler</Button>
                       </div>
                     </form>
                   ) : (
@@ -390,10 +390,10 @@ export function TagsList() {
                            </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => handleEdit(tag)}>
-                              <Edit className="mr-2 h-4 w-4" />Edit
+                              <Edit className="mr-2 h-4 w-4" />Modifier
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleDelete(tag.id || tag._id || '')}>
-                              <Trash2 className="mr-2 h-4 w-4" />Delete
+                              <Trash2 className="mr-2 h-4 w-4" />Supprimer
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -411,23 +411,23 @@ export function TagsList() {
       <AlertDialog open={bulkDeleteModalOpen} onOpenChange={setBulkDeleteModalOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Multiple Tags</AlertDialogTitle>
+            <AlertDialogTitle>Supprimer plusieurs tags</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete {selectedTags.length} tag{selectedTags.length > 1 ? 's' : ''}? This action cannot be undone and will permanently remove all selected tags from the system.
+              Êtes-vous sûr de vouloir supprimer {selectedTags.length} tag{selectedTags.length > 1 ? 's' : ''} ? Cette action ne peut pas être annulée et supprimera définitivement tous les tags sélectionnés du système.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleBulkDelete}
               className="bg-red-600 hover:bg-red-700"
               disabled={bulkActionLoading}
             >
-              {bulkActionLoading ? 'Deleting...' : `Delete ${selectedTags.length} Tag${selectedTags.length > 1 ? 's' : ''}`}
+              {bulkActionLoading ? 'Suppression...' : `Supprimer ${selectedTags.length} tag${selectedTags.length > 1 ? 's' : ''}`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </Card>
   );
-} 
+}

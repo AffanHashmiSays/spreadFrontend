@@ -22,7 +22,7 @@ export default function FooterSettingsPage() {
         const data = await api.get('/settings/footer', token || undefined);
         setFooterContent(data.footerContent || '');
       } catch (err) {
-        setError('Failed to load footer content');
+        setError('Échec du chargement du contenu du pied de page');
       } finally {
         setLoading(false);
       }
@@ -45,7 +45,7 @@ export default function FooterSettingsPage() {
       }
       setSuccess(true);
     } catch (err) {
-      setError('Failed to save footer content');
+      setError('Échec de la sauvegarde du contenu du pied de page');
     } finally {
       setSaving(false);
     }
@@ -54,28 +54,28 @@ export default function FooterSettingsPage() {
   return (
     <Card className="w-full max-w-2xl mx-auto mt-12 shadow-lg">
       <CardHeader>
-        <CardTitle>Footer Content</CardTitle>
+        <CardTitle>Contenu du Pied de Page</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSave} className="flex flex-col gap-4">
-          <label className="font-semibold text-zinc-700 dark:text-zinc-200">Footer Text</label>
+          <label className="font-semibold text-zinc-700 dark:text-zinc-200">Texte du Pied de Page</label>
           <Textarea
             value={footerContent}
             onChange={e => setFooterContent(e.target.value)}
             rows={6}
-            placeholder="Enter your footer content here..."
+            placeholder="Entrez le contenu de votre pied de page ici..."
             className="resize-y border rounded p-3 text-base shadow-sm focus:ring-2 focus:ring-indigo-500"
             required
           />
           {error && <div className="text-red-500 text-sm">{error}</div>}
-          {success && <div className="text-green-600 text-sm">Footer content saved!</div>}
+          {success && <div className="text-green-600 text-sm">Contenu du pied de page sauvegardé !</div>}
           <div className="flex justify-end">
             <Button type="submit" disabled={saving} className="px-6 py-2 text-base font-semibold">
-              {saving ? 'Saving...' : 'Save'}
+              {saving ? 'Sauvegarde...' : 'Sauvegarder'}
             </Button>
           </div>
         </form>
       </CardContent>
     </Card>
   );
-} 
+}

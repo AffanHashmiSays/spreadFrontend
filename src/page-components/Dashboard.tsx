@@ -125,7 +125,7 @@ const stats = [
           <CardContent>
             <div className="space-y-4">
               {recentPosts.map((post) => (
-                <div key={post.id} className="flex items-center justify-between">
+                <div key={post._id || post.id} className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">{post.title}</p>
                     <p className="text-sm text-muted-foreground">{new Date(post.createdAt).toLocaleString()}</p>

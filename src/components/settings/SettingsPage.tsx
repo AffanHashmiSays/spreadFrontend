@@ -348,11 +348,11 @@ export function SettingsPage() {
   };
   
   if (loading) {
-    return <div className="flex justify-center p-8">Loading settings...</div>;
+    return <div className="flex justify-center p-8">Chargement des paramètres...</div>;
   }
   
   if (!settings) {
-    return <div className="p-4 text-red-500 bg-red-50 rounded-md">Failed to load settings</div>;
+    return <div className="p-4 text-red-500 bg-red-50 rounded-md">Échec du chargement des paramètres</div>;
   }
   
   return (
@@ -493,17 +493,17 @@ export function SettingsPage() {
             
             <TabsContent value="seo" className="space-y-4">
               {seoLoading ? (
-                <div>Loading meta tags...</div>
+                <div>Chargement des balises méta...</div>
               ) : seo ? (
                 <>
               <div className="space-y-2">
-                    <Label htmlFor="title">Page Title</Label>
+                    <Label htmlFor="title">Titre de la page</Label>
                 <Input
                       id="title"
                       name="title"
                       value={seo.title || ''}
                       onChange={handleSeoChange}
-                      placeholder="Page Title"
+                      placeholder="Titre de la page"
                   maxLength={60}
                 />
               </div>
@@ -514,50 +514,50 @@ export function SettingsPage() {
                       name="description"
                       value={seo.description || ''}
                       onChange={handleSeoChange}
-                      placeholder="Meta description for your site"
+                      placeholder="Meta description de votre site"
                   maxLength={160}
                   className="min-h-[100px]"
                 />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="author">Meta Author</Label>
+                    <Label htmlFor="author">Meta Auteur</Label>
                     <Input
                       id="author"
                       name="author"
                       value={seo.author || ''}
                       onChange={handleSeoChange}
-                      placeholder="Author name"
+                      placeholder="Nom de l'auteur"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="keywords">Meta Keywords</Label>
+                    <Label htmlFor="keywords">Meta Mots-clés</Label>
                     <Input
                       id="keywords"
                       name="keywords"
                       value={seo.keywords || ''}
                       onChange={handleSeoChange}
-                      placeholder="keywords, separated, by, commas"
+                      placeholder="mots-clés, séparés, par, des, virgules"
                     />
               </div>
-                  <div className="pt-4 font-semibold">Open Graph (og:) Tags</div>
+                  <div className="pt-4 font-semibold">Balises Open Graph (og:)</div>
               <div className="space-y-2">
-                    <Label htmlFor="ogTitle">OG Title</Label>
+                    <Label htmlFor="ogTitle">Titre OG</Label>
                 <Input
                       id="ogTitle"
                       name="ogTitle"
                       value={seo.ogTitle || ''}
                       onChange={handleSeoChange}
-                      placeholder="OG Title"
+                      placeholder="Titre OG"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="ogDescription">OG Description</Label>
+                    <Label htmlFor="ogDescription">Description OG</Label>
                     <Textarea
                       id="ogDescription"
                       name="ogDescription"
                       value={seo.ogDescription || ''}
                       onChange={handleSeoChange}
-                      placeholder="OG Description"
+                      placeholder="Description OG"
                       className="min-h-[80px]"
                 />
               </div>
@@ -568,7 +568,7 @@ export function SettingsPage() {
                       name="ogUrl"
                       value={seo.ogUrl || ''}
                       onChange={handleSeoChange}
-                      placeholder="https://your-site.com"
+                      placeholder="https://votre-site.com"
                   type="url"
                 />
               </div>
@@ -579,7 +579,7 @@ export function SettingsPage() {
                       name="ogImage"
                       value={seo.ogImage || ''}
                       onChange={handleSeoChange}
-                      placeholder="https://your-site.com/image.jpg"
+                      placeholder="https://votre-site.com/image.jpg"
                   type="url"
                 />
               </div>
@@ -608,13 +608,13 @@ export function SettingsPage() {
                     </div>
                   </div>
               <div className="space-y-2">
-                    <Label htmlFor="ogImageAlt">OG Image Alt</Label>
+                    <Label htmlFor="ogImageAlt">Texte Alt Image OG</Label>
                 <Input
                       id="ogImageAlt"
                       name="ogImageAlt"
                       value={seo.ogImageAlt || ''}
                       onChange={handleSeoChange}
-                      placeholder="Image alt text"
+                      placeholder="Texte alternatif de l'image"
                 />
               </div>
               <div className="space-y-2">
@@ -627,9 +627,9 @@ export function SettingsPage() {
                       placeholder="website, article, etc."
                 />
               </div>
-                  <div className="pt-4 font-semibold">Twitter Card Tags</div>
+                  <div className="pt-4 font-semibold">Balises Twitter Card</div>
               <div className="space-y-2">
-                    <Label htmlFor="twitterCard">Twitter Card Type</Label>
+                    <Label htmlFor="twitterCard">Type de Twitter Card</Label>
                 <Input
                       id="twitterCard"
                       name="twitterCard"
@@ -639,28 +639,28 @@ export function SettingsPage() {
                 />
               </div>
               <div className="space-y-2">
-                    <Label htmlFor="twitterTitle">Twitter Title</Label>
+                    <Label htmlFor="twitterTitle">Titre Twitter</Label>
                 <Input
                       id="twitterTitle"
                       name="twitterTitle"
                       value={seo.twitterTitle || ''}
                       onChange={handleSeoChange}
-                      placeholder="Twitter Title"
+                      placeholder="Titre Twitter"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="twitterDescription">Twitter Description</Label>
+                    <Label htmlFor="twitterDescription">Description Twitter</Label>
                     <Textarea
                       id="twitterDescription"
                       name="twitterDescription"
                       value={seo.twitterDescription || ''}
                       onChange={handleSeoChange}
-                      placeholder="Twitter Description"
+                      placeholder="Description Twitter"
                       className="min-h-[80px]"
                 />
               </div>
               <div className="space-y-2">
-                    <Label htmlFor="twitterImage">Twitter Image URL</Label>
+                    <Label htmlFor="twitterImage">URL Image Twitter</Label>
                 <Input
                       id="twitterImage"
                       name="twitterImage"
@@ -676,7 +676,7 @@ export function SettingsPage() {
             
             <TabsContent value="analytics" className="space-y-4">
               {analyticsLoading ? (
-                <div>Loading Google Indexing credentials...</div>
+                <div>Chargement des identifiants Google Indexing...</div>
               ) : (
                 <>
               <div className="space-y-2">
@@ -707,27 +707,27 @@ export function SettingsPage() {
             
             <TabsContent value="bing" className="space-y-4">
               {bingLoading ? (
-                <div>Loading Bing Indexing data...</div>
+                <div>Chargement des données Bing Indexing...</div>
               ) : (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor="bingApiKey">Bing API Key</Label>
+                    <Label htmlFor="bingApiKey">Clé API Bing</Label>
                     <Input
                       id="bingApiKey"
                       name="apiKey"
                       value={bing.apiKey}
                       onChange={handleBingChange}
-                      placeholder="Enter your Bing API key"
+                      placeholder="Entrez votre clé API Bing"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="bingSiteUrl">Bing Site URL</Label>
+                    <Label htmlFor="bingSiteUrl">URL du Site Bing</Label>
                     <Input
                       id="bingSiteUrl"
                       name="siteUrl"
                       value={bing.siteUrl}
                       onChange={handleBingChange}
-                      placeholder="https://your-site.com"
+                      placeholder="https://votre-site.com"
                       type="url"
                     />
                   </div>

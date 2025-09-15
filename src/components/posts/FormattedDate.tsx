@@ -18,7 +18,7 @@ const FormattedDate: React.FC<FormattedDateProps> = ({ dateString }) => {
       month: 'long',
       day: 'numeric',
     };
-    setFormattedDate(new Intl.DateTimeFormat('en-US', options).format(date));
+    setFormattedDate(new Intl.DateTimeFormat('fr-FR', options).format(date));
   }, [dateString]);
 
   // Render the formatted date once it's available.

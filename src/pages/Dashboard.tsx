@@ -41,7 +41,7 @@ function Dashboard() {
   // Stats
 const stats = [
   {
-    title: 'Total Posts',
+    title: 'Total Articles',
     value: posts.length,
     change: '',
     icon: <FileText className="h-4 w-4" />,
@@ -86,7 +86,7 @@ const stats = [
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
 
-  if (loading) return <div className="flex justify-center p-8">Loading dashboard...</div>;
+  if (loading) return <div className="flex justify-center p-8">Chargement du tableau de bord...</div>;
   if (error) return <div className="p-4 text-red-500 bg-red-50 rounded-md">{error}</div>;
 
   return (
@@ -110,7 +110,7 @@ const stats = [
               <div className="mt-4">
                 <Button variant="ghost" size="sm" asChild>
                   <Link href={stat.link}>
-                    View all
+                    Voir tout
                     <ArrowUpRight className="ml-1 h-4 w-4" />
                   </Link>
                 </Button>
@@ -122,8 +122,8 @@ const stats = [
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="col-span-1">
           <CardHeader>
-            <CardTitle>Recent Posts</CardTitle>
-            <CardDescription>Latest content added to your CRM</CardDescription>
+            <CardTitle>Articles Récents</CardTitle>
+            <CardDescription>Dernier contenu ajouté à votre CRM</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -146,7 +146,7 @@ const stats = [
             <div className="mt-4">
               <Button variant="outline" size="sm" asChild>
                 <Link href="/dashboard/posts">
-                  View all posts
+                  Voir tous les articles
                 </Link>
               </Button>
             </div>

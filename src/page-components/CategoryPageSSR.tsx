@@ -47,16 +47,34 @@ function getExcerptFromContent(html: string, wordCount = 15): string {
   
   // Server-safe HTML stripping
   if (typeof document === 'undefined') {
-    // Server-side: use regex to strip HTML tags
-    const text = html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
-    return text.split(/\s+/).slice(0, wordCount).join(' ') + (text.split(/\s+/).length > wordCount ? '...' : '');
+    // Server-side: comprehensive HTML and entity stripping
+    let text = html
+      // Remove HTML tags
+      .replace(/<[^>]*>/g, '')
+      // Decode common HTML entities
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&hellip;/g, '...')
+      // Remove any remaining HTML entities
+      .replace(/&[a-zA-Z0-9#]+;/g, '')
+      // Normalize whitespace
+      .replace(/\s+/g, ' ')
+      .trim();
+    
+    const words = text.split(/\s+/).filter(word => word.length > 0);
+    return words.slice(0, wordCount).join(' ') + (words.length > wordCount ? '...' : '');
   }
   
   // Client-side: use DOM manipulation
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
-  const text = tmp.textContent || tmp.innerText || '';
-  return text.split(/\s+/).slice(0, wordCount).join(' ') + (text.split(/\s+/).length > wordCount ? '...' : '');
+  const text = (tmp.textContent || tmp.innerText || '').replace(/\s+/g, ' ').trim();
+  const words = text.split(/\s+/).filter(word => word.length > 0);
+  return words.slice(0, wordCount).join(' ') + (words.length > wordCount ? '...' : '');
 }
 
 interface CategoryPageSSRProps {
@@ -262,6 +280,9 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
 
   // Subcategories of the current parent category
   const subcategories = categories.filter(cat => cat.parentId === category._id);
+  
+  // All parent categories (categories without parentId)
+  const parentCategories = categories.filter(cat => !cat.parentId);
 
   // In the sidebar, use latestNewsPosts instead of latestNewsPosts from posts
   const getSidebarStories = () => latestNewsPosts;
@@ -294,7 +315,7 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
             {/* Date and Search Bar Row */}
             <div className="flex items-center justify-center relative">
               <div className="text-zinc-500 dark:text-zinc-400 text-sm">
-                {mounted ? new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : ''}
+                {mounted ? new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : ''}
               </div>
               <div className="absolute right-0">
                 <SearchBar onSearch={handleSearch} />
@@ -333,20 +354,41 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
               <div className="flex justify-center min-w-max">
                 <NavigationMenu>
                   <NavigationMenuList className="flex-nowrap gap-2 min-w-max">
-                    <NavigationMenuItem>
-                      <span
-                        className={
-                          'px-4 py-2 rounded-md text-sm font-medium transition-colors bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50 whitespace-nowrap inline-block cursor-default'
-                        }
-                      >
-                        {subcategory ? subcategory.name : category.name}
-                      </span>
-                    </NavigationMenuItem>
+                    {/* All Parent Categories */}
+                    {parentCategories.map(parentCat => (
+                      <NavigationMenuItem key={parentCat._id}>
+                        <Link
+                          href={`/${parentCat.slug}`}
+                          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap inline-block ${
+                            categorySlug === parentCat.slug 
+                              ? 'text-white' 
+                              : 'bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                          }`}
+                          style={categorySlug === parentCat.slug ? {backgroundColor: '#708238'} : {}}
+                          prefetch={true}
+                        >
+                          {parentCat.name}
+                        </Link>
+                      </NavigationMenuItem>
+                    ))}
+                    
+                    {/* Separator if there are subcategories */}
+                    {subcategories.length > 0 && (
+                      <NavigationMenuItem>
+                        <span className="px-2 py-2 text-zinc-400 dark:text-zinc-600">|</span>
+                      </NavigationMenuItem>
+                    )}
+                    
+                    {/* Subcategories of current category */}
                     {subcategories.map(subcat => (
                       <NavigationMenuItem key={subcat._id}>
                         <Link
                           href={`/${category.slug}/${subcat.slug}`}
-                          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap inline-block ${subcategorySlug === subcat.slug ? 'text-white' : 'bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}
+                          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap inline-block ${
+                            subcategorySlug === subcat.slug 
+                              ? 'text-white' 
+                              : 'bg-gray-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'
+                          }`}
                           style={subcategorySlug === subcat.slug ? {backgroundColor: '#708238'} : {}}
                           prefetch={true}
                         >
@@ -419,11 +461,11 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
                         {getExcerptFromContent(post.content, 25)}
                       </p>
                       <div className="flex flex-wrap gap-1 mb-3">
-                        {getCategoryNames(post.categoryIds).slice(0, 2).map(name => (
-                          <Badge key={name} variant="outline" className="text-xs bg-[#708238]">{name}</Badge>
+                        {getCategoryNames(post.categoryIds).slice(0, 2).map((name, index) => (
+                          <Badge key={`sidebar-cat-${post._id || post.id}-${name}-${index}`} variant="outline" className="text-xs bg-[#708238]">{name}</Badge>
                         ))}
-                        {getTagNames(post.tagIds).slice(0, 2).map(name => (
-                          <Badge key={name} variant="default" className="text-xs bg-[#708238] text-indigo-800 dark:bg-[#708238] dark:text-indigo-200">#{name}</Badge>
+                        {getTagNames(post.tagIds).slice(0, 2).map((name, index) => (
+                          <Badge key={`sidebar-tag-${post._id || post.id}-${name}-${index}`} variant="default" className="text-xs bg-[#708238] text-indigo-800 dark:bg-[#708238] dark:text-indigo-200">#{name}</Badge>
                         ))}
                       </div>
                       <div className="flex items-center justify-between mt-auto">
@@ -454,10 +496,10 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
           {posts.length === 0 ? (
             <div className="text-center py-12">
               <h2 className="text-2xl font-semibold text-zinc-600 dark:text-zinc-400 mb-4">
-                No posts found in this category
+                Aucun article trouvé dans cette catégorie
               </h2>
               <p className="text-zinc-500 dark:text-zinc-500">
-                Check back later for new content.
+                Revenez plus tard pour du nouveau contenu.
               </p>
             </div>
           ) : (
@@ -490,14 +532,14 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
                         )}
                         <p className="text-lg text-zinc-700 dark:text-zinc-300 mb-4 line-clamp-4">{getExcerptFromContent(mainStory.content, 40)}</p>
                         <div className="flex flex-wrap gap-2 mb-2">
-                          {getCategoryNames(mainStory.categoryIds).map(name => (
-                            <Badge key={name} variant="outline" className="text-xs">{name}</Badge>
+                          {getCategoryNames(mainStory.categoryIds).map((name, index) => (
+                            <Badge key={`main-cat-${mainStory._id || mainStory.id}-${name}-${index}`} variant="outline" className="text-xs">{name}</Badge>
                           ))}
-                          {getTagNames(mainStory.tagIds).map(name => (
-                            <Badge key={name} variant="default" className="text-xs bg-indigo-100 text-indigo-800">#{name}</Badge>
+                          {getTagNames(mainStory.tagIds).map((name, index) => (
+                            <Badge key={`main-tag-${mainStory._id || mainStory.id}-${name}-${index}`} variant="default" className="text-xs bg-indigo-100 text-indigo-800">#{name}</Badge>
                           ))}
                         </div>
-                        <div className="text-zinc-500 text-xs mb-2">{new Date(mainStory.createdAt).toLocaleDateString()}</div>
+                        <div className="text-zinc-500 text-xs mb-2">{new Date(mainStory.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
                         <Button asChild size="sm" className="w-fit">
                           <Link href={getPostUrl(mainStory)} className="hover:underline underline-offset-2 transition-all">Lire la suite</Link>
                         </Button>
@@ -505,7 +547,7 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
                     )}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       {secondaryStories.map(post => (
-                        <div key={post.id} className="flex flex-col border-b pb-4">
+                        <div key={post._id || post.id} className="flex flex-col border-b pb-4">
                                                   {getPostImage(post) && (
                           <LazyImage
                             src={getPostImage(post)!}
@@ -520,15 +562,15 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
                             <Link href={getPostUrl(post)} className="hover:underline underline-offset-2 transition-all">{post.title}</Link>
                           </h3>
                           <div className="flex flex-wrap gap-2 mb-1">
-                            {getCategoryNames(post.categoryIds).map(name => (
-                              <Badge key={name} variant="outline" className="text-xs">{name}</Badge>
+                            {getCategoryNames(post.categoryIds).map((name, index) => (
+                              <Badge key={`slider-cat-${post._id || post.id}-${name}-${index}`} variant="outline" className="text-xs">{name}</Badge>
                             ))}
-                            {getTagNames(post.tagIds).map(name => (
-                              <Badge key={name} variant="default" className="text-xs bg-indigo-100 text-indigo-800">#{name}</Badge>
+                            {getTagNames(post.tagIds).map((name, index) => (
+                              <Badge key={`slider-tag-${post._id || post.id}-${name}-${index}`} variant="default" className="text-xs bg-indigo-100 text-indigo-800">#{name}</Badge>
                             ))}
                           </div>
-                          <div className="text-zinc-500 text-xs mb-1">{new Date(post.createdAt).toLocaleDateString()}</div>
-                          <p className="text-zinc-700 dark:text-zinc-300 line-clamp-3 mb-2">{post.excerpt}</p>
+                          <div className="text-zinc-500 text-xs mb-1">{new Date(post.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                          <p className="text-zinc-700 dark:text-zinc-300 line-clamp-3 mb-2">{getExcerptFromContent(post.content, 25)}</p>
                           <Button asChild size="sm" variant="link" className="p-0 h-auto">
                             <Link href={getPostUrl(post)} className="hover:underline underline-offset-2 transition-all">Lire la suite</Link>
                           </Button>
@@ -541,7 +583,7 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
                       <h3 className="font-bold mb-2 text-zinc-800 dark:text-zinc-100">Dernières nouvelles</h3>
                       <ul className="space-y-2">
                         {sidebarStories.map(post => (
-                          <li key={post.id} className="flex items-center gap-4">
+                          <li key={post._id || post.id} className="flex items-center gap-4">
                             <div className="flex-1 min-w-0">
                               <Link href={getPostUrl(post)} className="hover:underline underline-offset-2 transition-all font-semibold line-clamp-2">
                                 {post.title}
@@ -550,14 +592,14 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
                                 {getExcerptFromContent(post.content)}
                               </div>
                               <div className="flex flex-wrap gap-1 mb-1">
-                                {getCategoryNames(post.categoryIds).map(name => (
-                                  <Badge key={name} variant="outline" className="text-xs">{name}</Badge>
+                                {getCategoryNames(post.categoryIds).map((name, index) => (
+                                  <Badge key={`secondary-cat-${post._id || post.id}-${name}-${index}`} variant="outline" className="text-xs">{name}</Badge>
                                 ))}
-                                {getTagNames(post.tagIds).map(name => (
-                                  <Badge key={name} variant="default" className="text-xs bg-indigo-100 text-indigo-800">#{name}</Badge>
+                                {getTagNames(post.tagIds).map((name, index) => (
+                                  <Badge key={`secondary-tag-${post._id || post.id}-${name}-${index}`} variant="default" className="text-xs bg-indigo-100 text-indigo-800">#{name}</Badge>
                                 ))}
                               </div>
-                              <div className="text-xs text-zinc-400">{new Date(post.createdAt).toLocaleDateString()}</div>
+                              <div className="text-xs text-zinc-400">{new Date(post.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
                             </div>
                             {getPostImage(post) && (
                               <LazyImage
@@ -586,7 +628,7 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
                     <Carousel>
                       <CarouselContent>
                         {slider.map(post => (
-                          <CarouselItem key={post.id} className="basis-1/2 md:basis-1/4">
+                          <CarouselItem key={post._id || post.id} className="basis-1/2 md:basis-1/4">
                             <div className="flex flex-col h-full border rounded-md p-2 bg-white dark:bg-zinc-900">
                               {getPostImage(post) && (
                                 <LazyImage
@@ -602,15 +644,15 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
                                 <Link href={getPostUrl(post)} className="hover:underline underline-offset-2 transition-all">{post.title}</Link>
                               </h4>
                               <div className="flex flex-wrap gap-2 mb-1">
-                                {getCategoryNames(post.categoryIds).map(name => (
-                                  <Badge key={name} variant="outline" className="text-xs">{name}</Badge>
+                                {getCategoryNames(post.categoryIds).map((name, index) => (
+                                  <Badge key={`grid-cat-${post._id || post.id}-${name}-${index}`} variant="outline" className="text-xs">{name}</Badge>
                                 ))}
-                                {getTagNames(post.tagIds).map(name => (
-                                  <Badge key={name} variant="default" className="text-xs bg-indigo-100 text-indigo-800">#{name}</Badge>
+                                {getTagNames(post.tagIds).map((name, index) => (
+                                  <Badge key={`grid-tag-${post._id || post.id}-${name}-${index}`} variant="default" className="text-xs bg-indigo-100 text-indigo-800">#{name}</Badge>
                                 ))}
                               </div>
-                              <div className="text-zinc-500 text-xs mb-1">{new Date(post.createdAt).toLocaleDateString()}</div>
-                              <p className="text-zinc-700 dark:text-zinc-300 line-clamp-2 mb-2">{post.excerpt}</p>
+                              <div className="text-zinc-500 text-xs mb-1">{new Date(post.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                              <p className="text-zinc-700 dark:text-zinc-300 line-clamp-2 mb-2">{getExcerptFromContent(post.content, 20)}</p>
                               <Button asChild size="sm" variant="link" className="p-0 h-auto">
                                 <Link href={getPostUrl(post)} className="hover:underline underline-offset-2 transition-all">Lire la suite</Link>
                               </Button>
@@ -648,7 +690,7 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
                 </div>
               )}
               {leftSmall.map(post => (
-                <div key={post.id} className="flex gap-3 items-center border-b pb-2">
+                <div key={post._id || post.id} className="flex gap-3 items-center border-b pb-2">
                   {getPostImage(post) && (
                     <LazyImage
                       src={getPostImage(post)!}
@@ -678,11 +720,11 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
                   <h2 className="text-2xl font-bold mb-1">
                     <Link href={getPostUrl(centerXL)} className="hover:underline underline-offset-2 transition-all">{centerXL.title}</Link>
                   </h2>
-                  <div className="text-xs text-zinc-500 mb-1">By Unknown | {new Date(centerXL.createdAt).toLocaleDateString()}</div>
+                  <div className="text-xs text-zinc-500 mb-1">By Unknown | {new Date(centerXL.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
                 </div>
               )}
               {centerSmall.map(post => (
-                <div key={post.id} className="flex gap-3 items-center border-b pb-2">
+                <div key={post._id || post.id} className="flex gap-3 items-center border-b pb-2">
                   {getPostImage(post) && (
                     <LazyImage
                       src={getPostImage(post)!}
@@ -715,7 +757,7 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
                 </div>
               )}
               {rightSmall.map(post => (
-                <div key={post.id} className="flex gap-3 items-center border-b pb-2">
+                <div key={post._id || post.id} className="flex gap-3 items-center border-b pb-2">
                   {getPostImage(post) && (
                     <LazyImage
                       src={getPostImage(post)!}
@@ -754,7 +796,7 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
                 const rightLarge = chunk[7];
                 const rightSmall = chunk.slice(8, 11);
                 return (
-                  <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div key={`chunk-${i}`} className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Left column */}
                     <div className="flex flex-col gap-6">
                       {leftLarge && (
@@ -774,7 +816,7 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
                         </div>
                       )}
                       {leftSmall.map(post => (
-                        <div key={post.id} className="flex gap-3 items-center border-b pb-2">
+                        <div key={post._id || post.id} className="flex gap-3 items-center border-b pb-2">
                           {getPostImage(post) && (
                             <LazyImage
                               src={getPostImage(post)!}
@@ -804,11 +846,11 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
                           <h2 className="text-2xl font-bold mb-1">
                             <Link href={getPostUrl(centerXL)} className="hover:underline underline-offset-2 transition-all">{centerXL.title}</Link>
                           </h2>
-                          <div className="text-xs text-zinc-500 mb-1">By Unknown | {new Date(centerXL.createdAt).toLocaleDateString()}</div>
+                          <div className="text-xs text-zinc-500 mb-1">By Unknown | {new Date(centerXL.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
                         </div>
                       )}
                       {centerSmall.map(post => (
-                        <div key={post.id} className="flex gap-3 items-center border-b pb-2">
+                        <div key={post._id || post.id} className="flex gap-3 items-center border-b pb-2">
                           {getPostImage(post) && (
                             <LazyImage
                               src={getPostImage(post)!}
@@ -841,7 +883,7 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
                         </div>
                       )}
                       {rightSmall.map(post => (
-                        <div key={post.id} className="flex gap-3 items-center border-b pb-2">
+                        <div key={post._id || post.id} className="flex gap-3 items-center border-b pb-2">
                           {getPostImage(post) && (
                             <LazyImage
                               src={getPostImage(post)!}

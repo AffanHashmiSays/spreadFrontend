@@ -715,7 +715,7 @@ export function PostForm({ isNewPost = false }: PostFormProps) {
   };
 
   if (loading && !isCreating) {
-    return <div>Loading...</div>;
+    return <div>Chargement...</div>;
   }
   
   if (error) {

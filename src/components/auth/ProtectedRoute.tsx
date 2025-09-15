@@ -28,7 +28,7 @@ export function ProtectedRoute({ children, adminOnly = false }: ProtectedRoutePr
   }, [user, loading, adminOnly, router]);
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return <div className="flex justify-center items-center h-screen">Chargement...</div>;
   }
 
   if (!user) {
@@ -40,4 +40,4 @@ export function ProtectedRoute({ children, adminOnly = false }: ProtectedRoutePr
   }
 
   return <>{children}</>;
-} 
+}

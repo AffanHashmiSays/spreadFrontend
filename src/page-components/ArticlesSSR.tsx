@@ -304,15 +304,34 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
   const modernStartIdx = 3 + 4; // skip first 3 (main+2) and 4 (carousel)
   const modernPosts = posts.slice(modernStartIdx, modernStartIdx + 11); // 1+3+1+2+1+3 = 11
   // Left: 1 large + 3 small, Center: 1 extra-large + 2 small, Right: 1 large + 3 small
-  const leftLarge = modernPosts[0];
-  const leftSmall = modernPosts.slice(1, 4);
-  const centerXL = modernPosts[4];
-  const centerSmall = modernPosts.slice(5, 7);
-  const rightLarge = modernPosts[7];
-  const rightSmall = modernPosts.slice(8, 11);
+  // Removed hardcoded layout variables - now using dynamic category-based content
   // Posts after the modern 3-column layout
   const afterModernIdx = modernStartIdx + modernPosts.length;
   const remainingPosts = posts.slice(afterModernIdx);
+
+  // Get posts for dynamic categories instead of hardcoded sections
+  const getPostsForCategory = (categoryId: string, limit: number = 2) => {
+    const filteredPosts = posts.filter(post => {
+      if (!post.categoryIds) return false;
+      
+      // Handle both string IDs and object IDs
+      return post.categoryIds.some((catId: any) => {
+        const id = typeof catId === 'string' ? catId : catId._id || catId.id;
+        return id === categoryId;
+      });
+    }).slice(0, limit);
+    return filteredPosts;
+  };
+
+  // Find categories with posts for dynamic sections
+  // Find ACTUALITÉS category or use categories with posts
+  const actualitesCategory = categories.find(c => c.name.toLowerCase().includes('actualit') || c.name.toLowerCase().includes('divertissement'));
+  const firstCategory = actualitesCategory || categories.find(c => getPostsForCategory(c._id, 1).length > 0) || categories[0];
+  const secondCategory = categories.find(c => c._id !== firstCategory?._id && getPostsForCategory(c._id, 1).length > 0) || categories[1];
+  const thirdCategory = categories.find(c => c._id !== firstCategory?._id && c._id !== secondCategory?._id && getPostsForCategory(c._id, 1).length > 0) || categories[2];
+  const firstCategoryPosts = firstCategory ? getPostsForCategory(firstCategory._id, 5) : [];
+  const secondCategoryPosts = secondCategory ? getPostsForCategory(secondCategory._id, 5) : [];
+  const thirdCategoryPosts = thirdCategory ? getPostsForCategory(thirdCategory._id, 5) : [];
 
   // Handle image load error - placeholder function (logic moved to backend)
   const handleImageError = (postId: string) => {
@@ -452,11 +471,11 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
                         {getExcerptFromContent(post.content, 25)}
                       </p>
                       <div className="flex flex-wrap gap-1 mb-3">
-                        {getCategoryNames(post.categoryIds).slice(0, 2).map(name => (
-                          <Badge key={name} variant="outline" className="text-xs">{name}</Badge>
+                        {getCategoryNames(post.categoryIds).slice(0, 2).map((name, index) => (
+                          <Badge key={`cat-${post._id || post.id}-${name}-${index}`} variant="outline" className="text-xs">{name}</Badge>
                         ))}
-                        {getTagNames(post.tagIds).slice(0, 2).map(name => (
-                          <Badge key={name} variant="default" className="text-xs bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">#{name}</Badge>
+                        {getTagNames(post.tagIds).slice(0, 2).map((name, index) => (
+                          <Badge key={`tag-${post._id || post.id}-${name}-${index}`} variant="default" className="text-xs bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">#{name}</Badge>
                         ))}
                       </div>
                       <div className="flex items-center justify-between mt-auto">
@@ -496,7 +515,7 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
       <div className="flex h-[500px] gap-2">
         {topPosts.map((post, index) => (
           <div 
-            key={post.id} 
+            key={post._id || post.id} 
             className="relative overflow-hidden group cursor-pointer transition-all duration-500 ease-out hover:flex-[2] flex-1"
           >
             {/* Background image */}
@@ -506,7 +525,7 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
                 alt={post.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 imageUrls={getPostImageWithFallbacks(post)}
-                onError={() => handleImageError(post.id)}
+                onError={() => handleImageError(post._id || post.id)}
               />
             )}
 
@@ -516,13 +535,13 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
             {/* Content overlay */}
             <div className="absolute bottom-6 left-6 right-6 text-white">
               {/* Category */}
-              {getCategoryNames(post.categoryIds).slice(0,1).map(name => (
+              {getCategoryNames(post.categoryIds).slice(0,1).map((name, index) => (
                 <span 
-                  key={name} 
+                  key={`hero-cat-${post._id || post.id}-${name}-${index}`} 
                   className={`inline-block text-xs font-semibold px-3 py-1 rounded-sm mb-3 ${
-                    name.toLowerCase() === "latest" ? "bg-green-500" :
-                    name.toLowerCase() === "important" ? "bg-orange-500" :
-                    name.toLowerCase() === "latest" ? "bg-pink-600" :
+                    name.toLowerCase() === firstCategory?.name?.toLowerCase() ? "bg-green-500" :
+                name.toLowerCase() === secondCategory?.name?.toLowerCase() ? "bg-pink-500" :
+                name.toLowerCase() === initialCategories[3]?.name?.toLowerCase() ? "bg-orange-500" :
                     name.toLowerCase() === "sports" ? "bg-red-600" :
                     "bg-indigo-600"
                   }`}
@@ -545,7 +564,7 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
 
               {/* Meta row */}
               <div className="mt-3 flex items-center gap-6 text-sm text-gray-300">
-                <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                <span>{new Date(post.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
               </div>
             </div>
           </div>
@@ -557,16 +576,7 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
 
  {/* 2nd section */}
 
-{sections.length > 0 && (() => {
-      const { section, slider } = sections[0];
-// Replace your slicing logic with this:
-const breakingPosts = [leftLarge, ...leftSmall].filter(Boolean).slice(0, 2);
-const mediaPosts = [centerXL, ...centerSmall].filter(Boolean).slice(0, 2);
-const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 3);
-
-
-
-      return (
+{/* Dynamic Post Sections */}
         <div className="mb-16">
           {/* Breaking News + Media of the day row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
@@ -574,12 +584,12 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
             <div className="lg:col-span-2">
               <div className="mb-6">
                 <h2 className="bg-red-600 text-white px-4 py-2 text-sm font-bold uppercase tracking-wide inline-block">
-                  Breaking News
+                  {firstCategory?.name || 'Actualités'}
                 </h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {breakingPosts.map((post, index) => (
-                  <div key={post.id} className="group cursor-pointer">
+                {firstCategoryPosts.map((post, index) => (
+                  <div key={post._id || post.id} className="group cursor-pointer">
                     {getPostImage(post) && (
                       <div className="relative overflow-hidden rounded mb-4">
                         <LazyImage
@@ -587,16 +597,16 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
                           alt={post.title}
                           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
                           imageUrls={getPostImageWithFallbacks(post)}
-                          onError={() => handleImageError(post.id)}
+                          onError={() => handleImageError(post._id || post.id)}
                         />
                       </div>
                     )}
                     
                     {/* Category badge */}
                     <div className="mb-3">
-                      {getCategoryNames(post.categoryIds).slice(0,1).map(name => (
+                      {getCategoryNames(post.categoryIds).slice(0,1).map((name, index) => (
                         <span 
-                          key={name} 
+                          key={`section-cat-${post._id || post.id}-${name}-${index}`} 
                           className="text-xs font-semibold px-2 py-1 rounded-sm bg-blue-600 text-white uppercase tracking-wide"
                         >
                           {name}
@@ -617,7 +627,7 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
 
                     {/* Meta info */}
                     <div className="flex items-center gap-4 text-xs text-gray-500">
-                      <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                      <span>{new Date(post.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                       <span>By Unknown</span>
                     </div>
                   </div>
@@ -629,12 +639,12 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
             <div className="lg:col-span-1">
               <div className="mb-6">
                 <h2 className="bg-gray-800 text-white px-4 py-2 text-sm font-bold uppercase tracking-wide inline-block">
-                  Media of the day
+                  {secondCategory?.name || 'Médias'}
                 </h2>
               </div>
               <div className="space-y-6">
-                {mediaPosts.map((post, index) => (
-                  <div key={post.id} className="group cursor-pointer">
+                {secondCategoryPosts.map((post, index) => (
+                  <div key={post._id || post.id} className="group cursor-pointer">
                     <div className="relative overflow-hidden rounded mb-3">
                       {getPostImage(post) && (
                         <LazyImage
@@ -642,15 +652,10 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
                           alt={post.title}
                           className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-500"
                           imageUrls={getPostImageWithFallbacks(post)}
-                          onError={() => handleImageError(post.id)}
+                          onError={() => handleImageError(post._id || post.id)}
                         />
                       )}
-                      {/* Play button overlay for media */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center group-hover:bg-white transition-colors">
-                          <div className="w-0 h-0 border-l-[8px] border-l-gray-800 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent ml-1"></div>
-                        </div>
-                      </div>
+
                     </div>
                     <h4 className="font-semibold text-sm leading-tight group-hover:text-blue-600 transition-colors">
                       <Link href={`/${post.slug}`} className="hover:underline underline-offset-2">
@@ -667,17 +672,27 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
           <div className="border-t pt-8">
             <div className="mb-6">
               <h2 className="bg-purple-600 text-white px-4 py-2 text-sm font-bold uppercase tracking-wide inline-block">
-                Entertainment
+                {thirdCategory?.name || 'Divertissement'}
               </h2>
-              <div className="flex gap-4 mt-3 text-sm">
-                <span className="text-purple-600 font-semibold cursor-pointer hover:underline">Celebrities</span>
-                <span className="text-gray-500 cursor-pointer hover:text-gray-700">Movies</span>
-                <span className="text-gray-500 cursor-pointer hover:text-gray-700">Music</span>
-              </div>
+              {/* Dynamic subcategories based on available tags */}
+              {tags.length > 0 && (
+                <div className="flex gap-4 mt-3 text-sm">
+                  {tags.slice(0, 3).map((tag, index) => (
+                    <span 
+                      key={`tag-${tag.id}-${index}`} 
+                      className={`cursor-pointer hover:underline ${
+                        index === 0 ? 'text-purple-600 font-semibold' : 'text-gray-500 hover:text-gray-700'
+                      }`}
+                    >
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {entertainmentPosts.map((post, index) => (
-                <div key={post.id} className="group cursor-pointer">
+              {thirdCategoryPosts.map((post, index) => (
+                <div key={post._id || post.id} className="group cursor-pointer">
                   {getPostImage(post) && (
                     <div className="relative overflow-hidden rounded mb-4">
                       <LazyImage
@@ -685,7 +700,7 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
                         alt={post.title}
                         className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
                         imageUrls={getPostImageWithFallbacks(post)}
-                        onError={() => handleImageError(post.id)}
+                        onError={() => handleImageError(post._id || post.id)}
                       />
                     </div>
                   )}
@@ -704,7 +719,7 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
                   </h3>
                   
                   <div className="flex items-center gap-4 text-xs text-gray-500 mb-2">
-                    <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                    <span>{new Date(post.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                     <span>2 Min Read</span>
                   </div>
                 </div>
@@ -712,12 +727,6 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
             </div>
           </div>
         </div>
-      );
-    })()}
-
-
-
-
 
           {/* Advertisement container */}
           <div className="my-12 w-full">
@@ -726,61 +735,61 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
             </div>
           </div>
 
-    {/* Three Category Columns Section - Travel, Fashion, Food & Drinks */}
+          {/* Three Category Columns Section */}
           <div className="border-t pt-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Travel Column */}
+              {/* First Category Column */}
               <div>
                 <div className="bg-green-500 text-white px-4 py-2 text-sm font-bold uppercase tracking-wide inline-block mb-4">
-                  HEADLINES
+                  {firstCategory?.name || 'ACTUALITÉS'}
                 </div>
                 
-                {/* Featured Travel Article */}
-                {leftLarge && (
+                {/* Featured Article */}
+                {firstCategoryPosts[0] && (
                   <div className="mb-6 group cursor-pointer">
-                    {getPostImage(leftLarge) && (
+                    {getPostImage(firstCategoryPosts[0]) && (
                       <div className="relative overflow-hidden rounded mb-3">
                         <LazyImage
-                          src={getPostImage(leftLarge)!}
-                          alt={leftLarge.title}
+                          src={getPostImage(firstCategoryPosts[0])!}
+                          alt={firstCategoryPosts[0].title}
                           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-                          imageUrls={getPostImageWithFallbacks(leftLarge)}
-                          onError={() => handleImageError(leftLarge.id)}
+                          imageUrls={getPostImageWithFallbacks(firstCategoryPosts[0])}
+                          onError={() => handleImageError(firstCategoryPosts[0].id)}
                         />
                         <div className="absolute top-3 left-3">
                           <span className="bg-green-500 text-white px-2 py-1 text-xs font-bold uppercase tracking-wide">
-                            HEADLINES
+                            {firstCategory?.name || 'ACTUALITÉS'}
                           </span>
                         </div>
                       </div>
                     )}
                     <h3 className="text-lg font-bold leading-tight mb-2 group-hover:text-green-600 transition-colors">
-                      <Link href={`/${leftLarge.slug}`} className="hover:underline underline-offset-2">
-                        {leftLarge.title}
+                      <Link href={`/${firstCategoryPosts[0].slug}`} className="hover:underline underline-offset-2">
+                        {firstCategoryPosts[0].title}
                       </Link>
                     </h3>
                     <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
                       <span>⏱</span>
-                      <span>1 week ago</span>
+                      <span>{new Date(firstCategoryPosts[0].createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                     </div>
                   </div>
                 )}
 
-                {/* Travel Small Articles */}
+                {/* Additional Articles */}
                 <div className="space-y-4">
-                  {leftSmall.slice(0, 4).map((post, index) => (
-                    <div key={post.id} className="flex gap-3 items-start group cursor-pointer">
+                  {firstCategoryPosts.slice(1).map((post, index) => (
+                    <div key={post._id || post.id} className="flex gap-3 items-start group cursor-pointer">
                       {getPostImage(post) && (
                         <LazyImage
                           src={getPostImage(post)!}
                           alt={post.title}
                           className="w-16 h-12 object-cover rounded flex-shrink-0"
                           imageUrls={getPostImageWithFallbacks(post)}
-                          onError={() => handleImageError(post.id)}
+                          onError={() => handleImageError(post._id || post.id)}
                         />
                       )}
                       <div className="flex-1 min-w-0">
-                        <span className="text-xs text-green-600 font-semibold uppercase tracking-wide">HEADLINES</span>
+                        <span className="text-xs text-green-600 font-semibold uppercase tracking-wide">{firstCategory?.name || 'ACTUALITÉS'}</span>
                         <h4 className="font-medium text-sm leading-tight line-clamp-2 group-hover:text-green-600 transition-colors">
                           <Link href={`/${post.slug}`} className="hover:underline underline-offset-2">
                             {post.title}
@@ -792,58 +801,58 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
                 </div>
               </div>
 
-              {/* Fashion Column */}
+              {/* Second Category Column */}
               <div>
                 <div className="bg-pink-500 text-white px-4 py-2 text-sm font-bold uppercase tracking-wide inline-block mb-4">
-                  Latest
+                  {secondCategory?.name || 'DERNIÈRES'}
                 </div>
                 
-                {/* Featured Fashion Article */}
-                {centerXL && (
+                {/* Featured Article */}
+                {secondCategoryPosts[0] && (
                   <div className="mb-6 group cursor-pointer">
-                    {getPostImage(centerXL) && (
+                    {getPostImage(secondCategoryPosts[0]) && (
                       <div className="relative overflow-hidden rounded mb-3">
                         <LazyImage
-                          src={getPostImage(centerXL)!}
-                          alt={centerXL.title}
+                          src={getPostImage(secondCategoryPosts[0])!}
+                          alt={secondCategoryPosts[0].title}
                           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-                          imageUrls={getPostImageWithFallbacks(centerXL)}
-                          onError={() => handleImageError(centerXL.id)}
+                          imageUrls={getPostImageWithFallbacks(secondCategoryPosts[0])}
+                          onError={() => handleImageError(secondCategoryPosts[0].id)}
                         />
                         <div className="absolute top-3 left-3">
                           <span className="bg-pink-500 text-white px-2 py-1 text-xs font-bold uppercase tracking-wide">
-                            LATEST
+                            {secondCategory?.name || 'DERNIÈRES'}
                           </span>
                         </div>
                       </div>
                     )}
                     <h3 className="text-lg font-bold leading-tight mb-2 group-hover:text-pink-600 transition-colors">
-                      <Link href={`/${centerXL.slug}`} className="hover:underline underline-offset-2">
-                        {centerXL.title}
+                      <Link href={`/${secondCategoryPosts[0].slug}`} className="hover:underline underline-offset-2">
+                        {secondCategoryPosts[0].title}
                       </Link>
                     </h3>
                     <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
                       <span>⏱</span>
-                      <span>1 week ago</span>
+                      <span>{new Date(secondCategoryPosts[0].createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                     </div>
                   </div>
                 )}
 
-                {/* Fashion Small Articles */}
+                {/* Additional Articles */}
                 <div className="space-y-4">
-                  {centerSmall.concat(rightSmall.slice(0, 2)).slice(0, 4).map((post, index) => (
-                    <div key={post.id} className="flex gap-3 items-start group cursor-pointer">
+                  {secondCategoryPosts.slice(1).map((post, index) => (
+                    <div key={post._id || post.id} className="flex gap-3 items-start group cursor-pointer">
                       {getPostImage(post) && (
                         <LazyImage
                           src={getPostImage(post)!}
                           alt={post.title}
                           className="w-16 h-12 object-cover rounded flex-shrink-0"
                           imageUrls={getPostImageWithFallbacks(post)}
-                          onError={() => handleImageError(post.id)}
+                          onError={() => handleImageError(post._id || post.id)}
                         />
                       )}
                       <div className="flex-1 min-w-0">
-                        <span className="text-xs text-pink-600 font-semibold uppercase tracking-wide">LATEST</span>
+                        <span className="text-xs text-pink-600 font-semibold uppercase tracking-wide">{secondCategory?.name || 'DERNIÈRES'}</span>
                         <h4 className="font-medium text-sm leading-tight line-clamp-2 group-hover:text-pink-600 transition-colors">
                           <Link href={`/${post.slug}`} className="hover:underline underline-offset-2">
                             {post.title}
@@ -855,58 +864,58 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
                 </div>
               </div>
 
-              {/* Food & Drinks Column */}
+              {/* Third Category Column */}
               <div>
                 <div className="bg-orange-500 text-white px-4 py-2 text-sm font-bold uppercase tracking-wide inline-block mb-4">
-                  Important
+                  {thirdCategory?.name || 'IMPORTANT'}
                 </div>
                 
-                {/* Featured Food & Drinks Article */}
-                {rightLarge && (
+                {/* Featured Article */}
+                {thirdCategoryPosts[0] && (
                   <div className="mb-6 group cursor-pointer">
-                    {getPostImage(rightLarge) && (
+                    {getPostImage(thirdCategoryPosts[0]) && (
                       <div className="relative overflow-hidden rounded mb-3">
                         <LazyImage
-                          src={getPostImage(rightLarge)!}
-                          alt={rightLarge.title}
+                          src={getPostImage(thirdCategoryPosts[0])!}
+                          alt={thirdCategoryPosts[0].title}
                           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-                          imageUrls={getPostImageWithFallbacks(rightLarge)}
-                          onError={() => handleImageError(rightLarge.id)}
+                          imageUrls={getPostImageWithFallbacks(thirdCategoryPosts[0])}
+                          onError={() => handleImageError(thirdCategoryPosts[0].id)}
                         />
                         <div className="absolute top-3 left-3">
                           <span className="bg-orange-500 text-white px-2 py-1 text-xs font-bold uppercase tracking-wide">
-                           IMPORTANT
+                           {thirdCategory?.name || 'IMPORTANT'}
                           </span>
                         </div>
                       </div>
                     )}
                     <h3 className="text-lg font-bold leading-tight mb-2 group-hover:text-orange-600 transition-colors">
-                      <Link href={`/${rightLarge.slug}`} className="hover:underline underline-offset-2">
-                        {rightLarge.title}
+                      <Link href={`/${thirdCategoryPosts[0].slug}`} className="hover:underline underline-offset-2">
+                        {thirdCategoryPosts[0].title}
                       </Link>
                     </h3>
                     <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
                       <span>⏱</span>
-                      <span>1 week ago</span>
+                      <span>{new Date(thirdCategoryPosts[0].createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                     </div>
                   </div>
                 )}
 
-                {/* Food & Drinks Small Articles */}
+                {/* Third Category Small Articles */}
                 <div className="space-y-4">
-                  {rightSmall.slice(0, 4).map((post, index) => (
-                    <div key={post.id} className="flex gap-3 items-start group cursor-pointer">
+                  {thirdCategoryPosts.slice(1, 5).map((post, index) => (
+                    <div key={post._id || post.id} className="flex gap-3 items-start group cursor-pointer">
                       {getPostImage(post) && (
                         <LazyImage
                           src={getPostImage(post)!}
                           alt={post.title}
                           className="w-16 h-12 object-cover rounded flex-shrink-0"
                           imageUrls={getPostImageWithFallbacks(post)}
-                          onError={() => handleImageError(post.id)}
+                          onError={() => handleImageError(post._id || post.id)}
                         />
                       )}
                       <div className="flex-1 min-w-0">
-                        <span className="text-xs text-orange-600 font-semibold uppercase tracking-wide">IMPORTANT</span>
+                        <span className="text-xs text-orange-600 font-semibold uppercase tracking-wide">{thirdCategory?.name || 'IMPORTANT'}</span>
                         <h4 className="font-medium text-sm leading-tight line-clamp-2 group-hover:text-orange-600 transition-colors">
                           <Link href={`/${post.slug}`} className="hover:underline underline-offset-2">
                             {post.title}
@@ -923,12 +932,12 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
             <div className="mt-16 border-t pt-8">
               <div className="mb-6">
                 <h2 className="bg-gray-800 text-white px-4 py-2 text-sm font-bold uppercase tracking-wide inline-block">
-                  Top Reviews
+                  Meilleures Critiques
                 </h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {remainingPosts.slice(0, 3).map((post, index) => (
-                  <div key={post.id} className="group cursor-pointer">
+                  <div key={post._id || post.id} className="group cursor-pointer">
                     {getPostImage(post) && (
                       <div className="relative overflow-hidden rounded mb-4">
                         <LazyImage
@@ -936,20 +945,20 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
                           alt={post.title}
                           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
                           imageUrls={getPostImageWithFallbacks(post)}
-                          onError={() => handleImageError(post.id)}
+                          onError={() => handleImageError(post._id || post.id)}
                         />
                       </div>
                     )}
                     
                     {/* Category badge */}
                     <div className="mb-3">
-                      {getCategoryNames(post.categoryIds).slice(0,1).map(name => (
+                      {getCategoryNames(post.categoryIds).slice(0,1).map((name, index) => (
                         <span 
-                          key={name} 
+                          key={`grid-cat-${post._id || post.id}-${name}-${index}`} 
                           className={`text-xs font-semibold px-2 py-1 rounded-sm uppercase tracking-wide ${
-                            name.toLowerCase().includes('headlines') ? 'bg-green-500 text-white' :
-                            name.toLowerCase().includes('latest') ? 'bg-pink-500 text-white' :
-                            name.toLowerCase().includes('important') ? 'bg-orange-500 text-white' :
+                            name.toLowerCase() === firstCategory?.name?.toLowerCase() ? 'bg-green-500 text-white' :
+                name.toLowerCase() === secondCategory?.name?.toLowerCase() ? 'bg-pink-500 text-white' :
+                name.toLowerCase() === initialCategories[3]?.name?.toLowerCase() ? 'bg-orange-500 text-white' :
                             'bg-gray-600 text-white'
                           }`}
                         >
@@ -967,8 +976,8 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
                     {/* Rating stars */}
                     <div className="flex items-center gap-2 mb-2">
                       <div className="flex">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <span key={i} className="text-yellow-400 text-sm">★</span>
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <span key={`${post._id || post.id}-star-${i}`} className="text-yellow-400 text-sm">★</span>
                         ))}
                       </div>
                       <span className="text-xs text-gray-500">2 Min Read</span>
@@ -982,14 +991,14 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
             <div className="mt-16">
               <div className="mb-6">
                 <h2 className="bg-black text-white px-4 py-2 text-sm font-bold uppercase tracking-wide inline-block">
-                  Popular This Week
+                  Populaire Cette Semaine
                 </h2>
               </div>
               
               {/* Top 4 featured articles with large images */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {remainingPosts.slice(3, 7).map((post, index) => (
-                  <div key={post.id} className="group cursor-pointer">
+                  <div key={post._id || post.id} className="group cursor-pointer">
                     {getPostImage(post) && (
                       <div className="relative overflow-hidden rounded mb-3">
                         <LazyImage
@@ -997,16 +1006,16 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
                           alt={post.title}
                           className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-500"
                           imageUrls={getPostImageWithFallbacks(post)}
-                          onError={() => handleImageError(post.id)}
+                          onError={() => handleImageError(post._id || post.id)}
                         />
                         <div className="absolute top-2 left-2">
-                          {getCategoryNames(post.categoryIds).slice(0,1).map(name => (
+                          {getCategoryNames(post.categoryIds).slice(0,1).map((name, index) => (
                             <span 
-                              key={name} 
+                              key={`overlay-cat-${post._id || post.id}-${name}-${index}`} 
                               className={`text-xs font-bold px-2 py-1 uppercase tracking-wide ${
                                 name.toLowerCase().includes('sport') ? 'bg-red-600 text-white' :
-                                name.toLowerCase().includes('important') ? 'bg-orange-500 text-white' :
-                                name.toLowerCase().includes('latest') ? 'bg-pink-500 text-white' :
+                                name.toLowerCase() === initialCategories[3]?.name?.toLowerCase() ? 'bg-orange-500 text-white' :
+                name.toLowerCase() === secondCategory?.name?.toLowerCase() ? 'bg-pink-500 text-white' :
                                 name.toLowerCase().includes('tech') ? 'bg-blue-600 text-white' :
                                 'bg-gray-700 text-white'
                               }`}
@@ -1035,7 +1044,7 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
                 {/* Sports Column */}
                 <div className="space-y-3">
                   {remainingPosts.slice(7, 10).map((post, index) => (
-                    <div key={post.id} className="group cursor-pointer">
+                    <div key={post._id || post.id} className="group cursor-pointer">
                       <div className="mb-1">
                         <span className="text-xs font-semibold text-red-600 uppercase tracking-wide">FEATURED</span>
                       </div>
@@ -1055,9 +1064,9 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
                 {/* Food & Drinks Column */}
                 <div className="space-y-3">
                   {remainingPosts.slice(10, 13).map((post, index) => (
-                    <div key={post.id} className="group cursor-pointer">
+                    <div key={post._id || post.id} className="group cursor-pointer">
                       <div className="mb-1">
-                        <span className="text-xs font-semibold text-orange-600 uppercase tracking-wide">IMPORTANT</span>
+                        <span className="text-xs font-semibold text-orange-600 uppercase tracking-wide">{initialCategories[3]?.name || 'IMPORTANT'}</span>
                       </div>
                       <h4 className="font-medium text-sm leading-tight line-clamp-2 group-hover:text-orange-600 transition-colors mb-1">
                         <Link href={`/${post.slug}`} className="hover:underline underline-offset-2">
@@ -1075,7 +1084,7 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
                 {/* Technology Column */}
                 <div className="space-y-3">
                   {remainingPosts.slice(13, 16).map((post, index) => (
-                    <div key={post.id} className="group cursor-pointer">
+                    <div key={post._id || post.id} className="group cursor-pointer">
                       <div className="mb-1">
                         <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide">TRENDING</span>
                       </div>
@@ -1095,7 +1104,7 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
                 {/* Entertainment Column */}
                 <div className="space-y-3">
                   {remainingPosts.slice(16, 19).map((post, index) => (
-                    <div key={post.id} className="group cursor-pointer">
+                    <div key={post._id || post.id} className="group cursor-pointer">
                       <div className="mb-1">
                         <span className="text-xs font-semibold text-purple-600 uppercase tracking-wide">ENTERTAINMENT</span>
                       </div>
@@ -1122,7 +1131,7 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
   <div className=" mt-16">
     <div className="space-y-6">
       {remainingPosts.slice(19).map((post, index) => (
-        <div key={post.id} className="flex gap-4 pb-6 border-b border-gray-200 dark:border-gray-700 last:border-b-0 group">
+        <div key={post._id || post.id} className="flex gap-4 pb-6 border-b border-gray-200 dark:border-gray-700 last:border-b-0 group">
           {/* Article Image */}
           <div className="flex-shrink-0">
             {getPostImage(post) && (
@@ -1131,7 +1140,7 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
                 alt={post.title}
                 className="w-48 h-32 object-cover rounded group-hover:scale-105 transition-transform duration-500"
                 imageUrls={getPostImageWithFallbacks(post)}
-                onError={() => handleImageError(post.id)}
+                onError={() => handleImageError(post._id || post.id)}
               />
             )}
           </div>
@@ -1140,16 +1149,16 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
           <div className="flex-1 flex flex-col justify-between">
             {/* Category Tag */}
             <div className="mb-2">
-              {getCategoryNames(post.categoryIds).slice(0,1).map(name => (
+              {getCategoryNames(post.categoryIds).slice(0,1).map((name, index) => (
                 <span 
-                  key={name} 
+                  key={`sidebar-cat-${post._id || post.id}-${name}-${index}`} 
                   className={`text-xs font-bold uppercase tracking-wide ${
                     name.toLowerCase().includes('tech') ? 'text-blue-600' :
                     name.toLowerCase().includes('sport') ? 'text-red-600' :
                     name.toLowerCase().includes('entertainment') ? 'text-purple-600' :
-                    name.toLowerCase().includes('latest') ? 'text-pink-600' :
-                    name.toLowerCase().includes('food') ? 'text-orange-600' :
-                    name.toLowerCase().includes('headlines') ? 'text-green-600' :
+                    name.toLowerCase() === secondCategory?.name?.toLowerCase() ? 'text-pink-600' :
+                name.toLowerCase() === initialCategories[3]?.name?.toLowerCase() ? 'text-orange-600' :
+                name.toLowerCase() === firstCategory?.name?.toLowerCase() ? 'text-green-600' :
                     'text-gray-600'
                   }`}
                 >
@@ -1189,7 +1198,7 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
         disabled={isLoading || pagination.currentPage >= pagination.totalPages}
         className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-8 py-3 rounded font-medium transition-colors"
       >
-        {isLoading ? 'Loading...' : 'LOAD MORE'}
+        {isLoading ? 'Chargement...' : 'CHARGER PLUS'}
       </button>
     </div>
   </div>
@@ -1199,8 +1208,8 @@ const entertainmentPosts = [rightLarge, ...rightSmall].filter(Boolean).slice(0, 
         {/* loading skeletons */}
         {isLoading && !searchQuery.trim() && (
           <div className="max-w-7xl mx-auto mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <SkeletonPost key={i} />
+            {Array.from({ length: 6 }, (_, i) => (
+              <SkeletonPost key={`skeleton-${i}`} />
             ))}
           </div>
         )}

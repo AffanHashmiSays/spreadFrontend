@@ -168,7 +168,7 @@ export function PostView({ slug: propSlug }: PostViewProps = {}) {
   }
   const placeholderImg = 'https://placehold.co/100x100?text=No+Image';
 
-  if (loading) return <div className="p-8 text-center">Loading...</div>;
+  if (loading) return <div className="p-8 text-center">Chargement...</div>;
   if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
   if (!post) return null;
 

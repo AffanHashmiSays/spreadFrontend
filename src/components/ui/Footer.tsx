@@ -118,7 +118,7 @@ export default function Footer({ categories = [], latestNews = [], footerContent
                       <Link href={`/posts/${news.slug}`} className="text-zinc-200 hover:text-white font-semibold">
                         {news.title}
                       </Link>
-                      <div className="text-xs text-zinc-400">{new Date(news.createdAt).toLocaleDateString()}</div>
+                      <div className="text-xs text-zinc-400">{new Date(news.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'numeric', year: 'numeric' })}</div>
                     </li>
                   ))
                 ) : (
@@ -172,4 +172,4 @@ export default function Footer({ categories = [], latestNews = [], footerContent
       </div>
     </footer>
   );
-} 
+}

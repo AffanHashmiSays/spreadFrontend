@@ -796,7 +796,7 @@ export default function ArticlesAMP({ initialPosts, categories, initialPaginatio
                 const chunkRightSmall = chunk.slice(8, 11);
                 
                 return (
-                  <div key={i} style={{
+                  <div key={`amp-chunk-${i}`} style={{
                     display: 'grid',
                     gridTemplateColumns: '1fr',
                     gap: '24px'
