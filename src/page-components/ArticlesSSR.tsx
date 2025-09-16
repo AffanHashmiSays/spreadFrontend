@@ -677,7 +677,7 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
               {/* Dynamic subcategories based on available tags */}
               {tags.length > 0 && (
                 <div className="flex gap-4 mt-3 text-sm">
-                  {tags.slice(0, 3).map((tag, index) => (
+                  {tags.filter(tag => tag.name.toLowerCase() !== 'romeo').slice(0, 3).map((tag, index) => (
                     <span 
                       key={`tag-${tag.id}-${index}`} 
                       className={`cursor-pointer hover:underline ${
@@ -720,7 +720,7 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
                   
                   <div className="flex items-center gap-4 text-xs text-gray-500 mb-2">
                     <span>{new Date(post.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-                    <span>2 Min Read</span>
+                    <span>2 Min de Lecture</span>
                   </div>
                 </div>
               ))}
@@ -756,11 +756,6 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
                           imageUrls={getPostImageWithFallbacks(firstCategoryPosts[0])}
                           onError={() => handleImageError(firstCategoryPosts[0].id)}
                         />
-                        <div className="absolute top-3 left-3">
-                          <span className="bg-green-500 text-white px-2 py-1 text-xs font-bold uppercase tracking-wide">
-                            {firstCategory?.name || 'ACTUALITÉS'}
-                          </span>
-                        </div>
                       </div>
                     )}
                     <h3 className="text-lg font-bold leading-tight mb-2 group-hover:text-green-600 transition-colors">
@@ -819,11 +814,6 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
                           imageUrls={getPostImageWithFallbacks(secondCategoryPosts[0])}
                           onError={() => handleImageError(secondCategoryPosts[0].id)}
                         />
-                        <div className="absolute top-3 left-3">
-                          <span className="bg-pink-500 text-white px-2 py-1 text-xs font-bold uppercase tracking-wide">
-                            {secondCategory?.name || 'DERNIÈRES'}
-                          </span>
-                        </div>
                       </div>
                     )}
                     <h3 className="text-lg font-bold leading-tight mb-2 group-hover:text-pink-600 transition-colors">
@@ -882,11 +872,7 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
                           imageUrls={getPostImageWithFallbacks(thirdCategoryPosts[0])}
                           onError={() => handleImageError(thirdCategoryPosts[0].id)}
                         />
-                        <div className="absolute top-3 left-3">
-                          <span className="bg-orange-500 text-white px-2 py-1 text-xs font-bold uppercase tracking-wide">
-                           {thirdCategory?.name || 'IMPORTANT'}
-                          </span>
-                        </div>
+
                       </div>
                     )}
                     <h3 className="text-lg font-bold leading-tight mb-2 group-hover:text-orange-600 transition-colors">
@@ -980,7 +966,7 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
                           <span key={`${post._id || post.id}-star-${i}`} className="text-yellow-400 text-sm">★</span>
                         ))}
                       </div>
-                      <span className="text-xs text-gray-500">2 Min Read</span>
+                      <span className="text-xs text-gray-500">2 Min de Lecture</span>
                     </div>
                   </div>
                 ))}
