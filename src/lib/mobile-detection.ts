@@ -29,7 +29,7 @@ export async function shouldRedirectToAMP(): Promise<boolean> {
 }
 
 export function getAMPUrl(currentPath: string): string {
-  const baseUrl = process.env.NEXT_PUBLIC_DOMAIN || 'https://spread.cemantix.net';
+  const baseUrl = process.env.NEXT_PUBLIC_DOMAIN || 'https://spreadtheword.fr';
   
   // For homepage
   if (currentPath === '/') {

@@ -201,7 +201,7 @@ export function PostView({ slug: propSlug }: PostViewProps = {}) {
           <header className="mb-4 border-b pb-4 text-center relative">
             <h1 className="text-4xl md:text-5xl font-serif font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 mb-6">
             <Link href="/" className="hover:opacity-80 transition-opacity cursor-pointer">
-                Handicap International
+                Spread The Word
               </Link>
             </h1>
             <div className="text-zinc-500 dark:text-zinc-400 text-sm">{new Date(post.createdAt).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>

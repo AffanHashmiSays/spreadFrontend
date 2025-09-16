@@ -1,6 +1,6 @@
 import { Post, Category } from '../types/post';
 
-const imageBaseUrl = 'https://spread.cemantix.net';
+const imageBaseUrl = 'https://spreadtheword.fr';
 
 function getPostImage(post: Post): string | null {
   if (Array.isArray(post.image_urls) && post.image_urls.length > 0) {
@@ -230,7 +230,7 @@ export default function PostAMP({ post, categories }: PostAMPProps) {
                 flexWrap: 'wrap'
               }}>
                 <a 
-                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://spread.cemantix.net/posts/${post.slug}`)}`}
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://spreadtheword.fr/posts/${post.slug}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
@@ -246,7 +246,7 @@ export default function PostAMP({ post, categories }: PostAMPProps) {
                   Facebook
                 </a>
                 <a 
-                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://spread.cemantix.net/posts/${post.slug}`)}&text=${encodeURIComponent(post.title)}`}
+                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://spreadtheword.fr/posts/${post.slug}`)}&text=${encodeURIComponent(post.title)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
@@ -262,7 +262,7 @@ export default function PostAMP({ post, categories }: PostAMPProps) {
                   Twitter
                 </a>
                 <a 
-                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://spread.cemantix.net/posts/${post.slug}`)}`}
+                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://spreadtheword.fr/posts/${post.slug}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{

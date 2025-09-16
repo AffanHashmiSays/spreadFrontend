@@ -1,6 +1,6 @@
 import { Post, Category } from '../types/post';
 
-const imageBaseUrl = 'https://spread.cemantix.net';
+const imageBaseUrl = 'https://spreadtheword.fr';
 
 function getPostImage(post: Post): string | null {
   if (Array.isArray(post.image_urls) && post.image_urls.length > 0) {

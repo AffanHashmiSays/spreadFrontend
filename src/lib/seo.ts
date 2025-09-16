@@ -129,29 +129,29 @@ export const generateHomeMetadata = (): Metadata => {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api', '');
   
   return {
-    title: 'Handicap International France | Humanité, Inclusion et Solidarité Mondiale',
-    description: 'Handicap International France agit dans plus de 60 pays pour soutenir les personnes handicapées et vulnérables. Actualités, missions humanitaires, droits humains, déminage, inclusion et urgences. Engagez-vous à nos côtés pour un monde plus solidaire',
+    title: 'Spread The Word | Humanité, Inclusion et Solidarité Mondiale',
+    description: 'Spread the Word France agit dans plus de 60 pays pour soutenir les personnes handicapées et vulnérables. Actualités, missions humanitaires, droits humains, déminage, inclusion et urgences. Engagez-vous à nos côtés pour un monde plus solidaire',
     
     openGraph: {
-      title: 'Handicap International France | Humanité, Inclusion et Solidarité Mondiale',
-      description: 'Handicap International France intervient dans plus de 60 pays pour accompagner les personnes handicapées et vulnérables. Découvrez nos actions, nos actualités et comment vous engager.',
+      title: 'Spread the Word France | Humanité, Inclusion et Solidarité Mondiale',
+      description: 'Spread the Word France intervient dans plus de 60 pays pour accompagner les personnes handicapées et vulnérables. Découvrez nos actions, nos actualités et comment vous engager.',
       type: 'website',
-      url: 'https://spread.cemantix.net/',
+      url: 'https://spreadtheword.fr/',
       images: [
         {
-          url: 'https://spread.cemantix.net/images/partage.jpg',
+          url: 'https://spreadtheword.fr/images/partage.jpg',
           width: 1200,
           height: 630,
-          alt: 'Handicap International France | Humanité, Inclusion et Solidarité Mondiale',
+          alt: 'Spread the Word France | Humanité, Inclusion et Solidarité Mondiale',
         }
       ]
     },
     
     twitter: {
       card: 'summary_large_image',
-      title: 'Handicap International France | Humanité, Inclusion et Solidarité Mondiale',
+      title: 'Spread the Word France | Humanité, Inclusion et Solidarité Mondiale',
       description: 'Découvrez nos actions humanitaires en faveur des personnes handicapées et vulnérables dans le monde. Informez-vous, agissez, soutenez-nous.',
-      images: ['https://spread.cemantix.net/images/partage.jpg']
+      images: ['https://spreadtheword.fr/images/partage.jpg']
     },
   };
 };

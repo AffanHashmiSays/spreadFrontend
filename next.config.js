@@ -27,7 +27,7 @@ const nextConfig = {
   },
   env: {
     CUSTOM_KEY: 'my-value',
-    NEXT_PUBLIC_API_BASE_URL: 'https://spreadback.cemantix.net/api',
+    NEXT_PUBLIC_API_BASE_URL: 'https://be.spreadtheword.fr/api',
   },
 
   // Add headers for caching optimization
@@ -114,7 +114,7 @@ const nextConfig = {
 
   // Rewrite backend URLs to appear as frontend URLs
   async rewrites() {
-    const backendBaseUrl = 'https://spreadback.cemantix.net';
+    const backendBaseUrl = 'https://be.spreadtheword.fr';
 
     return [
 
@@ -143,7 +143,7 @@ const nextConfig = {
 
   publicRuntimeConfig: {
     WEBHOOK_SECRET: "Qw7!pZ2#rT9$kLm8@vX4^sB1&nH6*eJ3",
-    DOMAIN: 'https://spread.cemantix.net',
+    DOMAIN: 'https://spreadtheword.fr',
   },
 }
 

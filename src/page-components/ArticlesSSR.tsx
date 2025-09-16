@@ -34,7 +34,7 @@ const SkeletonPost: React.FC = () => (
 );
 
 const placeholderImg = 'https://placehold.co/600x400?text=No+Image';
-const imageBaseUrl = 'https://spread.cemantix.net';
+const imageBaseUrl = 'https://spreadtheword.fr';
 
 function extractFirstImage(html: string): string | null {
   if (!html) return null;

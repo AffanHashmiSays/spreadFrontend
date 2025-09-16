@@ -1,6 +1,6 @@
 export async function GET() {
   try {
-    const backendUrl ='https://spreadback.cemantix.net';
+    const backendUrl ='https://be.spreadtheword.fr';
     const response = await fetch(`${backendUrl}/sitemap.xml`);
     
     if (!response.ok) {

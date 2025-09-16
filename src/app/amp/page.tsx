@@ -97,7 +97,7 @@ export default async function AMPPage() {
   const mainImageUrl = mainStory && Array.isArray(mainStory.image_urls) && mainStory.image_urls.length > 0 
     ? mainStory.image_urls[0].startsWith('http') 
       ? mainStory.image_urls[0] 
-      : `https://spread.cemantix.net${mainStory.image_urls[0].startsWith('/') ? '' : '/'}${mainStory.image_urls[0]}`
+      : `https://spreadtheword.fr${mainStory.image_urls[0].startsWith('/') ? '' : '/'}${mainStory.image_urls[0]}`
     : null;
   
   return (

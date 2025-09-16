@@ -322,7 +322,7 @@ export function PostsList() {
       setPostToDelete(null);
       // Notify Google and Bing Indexing APIs
       if (post) {
-        const postUrl = `https://spread.cemantix.net/posts/${post.slug}`;
+        const postUrl = `https://spreadtheword.fr/posts/${post.slug}`;
         try {
           await fetch('/api/notify-indexing', {
             method: 'POST',
@@ -383,7 +383,7 @@ export function PostsList() {
       // Notify Google and Bing Indexing APIs for each deleted post
       await Promise.all(
         postsToDelete.map(async (post) => {
-          const postUrl = `https://spread.cemantix.net/posts/${post.slug}`;
+          const postUrl = `https://spreadtheword.fr/posts/${post.slug}`;
           try {
             await fetch('/api/notify-indexing', {
               method: 'POST',
@@ -494,7 +494,7 @@ export function PostsList() {
       }, token || undefined);
 
       // Notify Google and Bing Indexing APIs for edit
-      const postUrl = `https://spread.cemantix.net/posts/${currentPost.slug}`;
+      const postUrl = `https://spreadtheword.fr/posts/${currentPost.slug}`;
       try {
         await fetch('/api/notify-indexing', {
           method: 'POST',

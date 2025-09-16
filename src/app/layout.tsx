@@ -83,7 +83,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com" />
         <link rel="preconnect"
-          href="https://spread.cemantix.net"
+          href="https://spreadtheword.fr"
           crossOrigin="anonymous"
         />
         <link rel="preload" href="/favicon.ico" as="image" type="image/x-icon" />

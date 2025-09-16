@@ -20,7 +20,7 @@ export function AMPImage({
   priority = false
 }: AMPImageProps) {
   // Clean up src URL
-  const cleanSrc = src.startsWith('http') ? src : `https://spread.cemantix.net${src.startsWith('/') ? '' : '/'}${src}`;
+  const cleanSrc = src.startsWith('http') ? src : `https://spreadtheword.fr${src.startsWith('/') ? '' : '/'}${src}`;
   
   const imageProps = {
     src: cleanSrc,

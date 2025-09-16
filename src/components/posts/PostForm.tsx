@@ -324,7 +324,7 @@ export function PostForm({ isNewPost = false }: PostFormProps) {
         response = await api.put(`/posts/${id}`, postData, token || undefined);
         // Notify Google Indexing API
         try {
-          const postUrl = `https://spread.cemantix.net/${slug}`;
+          const postUrl = `https://spreadtheword.fr/${slug}`;
           await fetch('/api/notify-indexing', {
             method: 'POST',
             headers: {

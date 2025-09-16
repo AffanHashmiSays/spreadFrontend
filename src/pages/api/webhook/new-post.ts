@@ -39,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Invalid post data, slug is required' });
   }
 
-  const postUrl = `https://spread.cemantix.net/posts/${post.slug}`;
+  const postUrl = `https://spreadtheword.fr/posts/${post.slug}`;
   console.log(`[WEBHOOK] Received new post, preparing to index URL: ${postUrl}`);
 
   try {
