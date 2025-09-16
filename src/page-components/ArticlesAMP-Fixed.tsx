@@ -112,7 +112,7 @@ export default function ArticlesAMP({ posts, categories }: ArticlesAMPProps) {
       {/* Navigation Categories */}
       <nav className="nav-categories">
         <div className="nav-list">
-          <a href="/" className="nav-item active">Tout</a>
+          <a href="/" className="nav-item active">MAISON</a>
           {parentCategories.slice(0, 8).map(category => (
             <a 
               key={category._id} 

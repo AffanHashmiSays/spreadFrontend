@@ -221,7 +221,9 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
   };
 
   const getCategoryNames = (cats: any[]) =>
-    cats.map(cat => typeof cat === 'string' ? categories.find(c => c._id === cat)?.name : cat.name).filter(Boolean);
+    cats.map(cat => typeof cat === 'string' ? categories.find(c => c._id === cat)?.name : cat.name)
+        .filter(Boolean)
+        .filter(name => name !== 'DIVERTISSEMENT'); // Exclude DIVERTISSEMENT category
   const getTagNames = (tagsArr: any[]) =>
     tagsArr.map(tag => typeof tag === 'string' ? tags.find(t => t.id === tag)?.name : tag.name).filter(Boolean);
 
@@ -281,7 +283,7 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
   // Subcategories of the current parent category
   const subcategories = categories.filter(cat => cat.parentId === category._id);
   
-  // All parent categories (categories without parentId)
+  // All parent categories (categories without parentId) - include DIVERTISSEMENT in navigation
   const parentCategories = categories.filter(cat => !cat.parentId);
 
   // In the sidebar, use latestNewsPosts instead of latestNewsPosts from posts

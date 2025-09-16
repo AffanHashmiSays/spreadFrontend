@@ -110,7 +110,9 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
 
   // Helper functions for getting category and tag names
   const getCategoryNames = (cats: any[]) =>
-    cats.map(cat => typeof cat === 'string' ? categories.find(c => c._id === cat)?.name : cat.name).filter(Boolean);
+    cats.map(cat => typeof cat === 'string' ? categories.find(c => c._id === cat)?.name : cat.name)
+        .filter(Boolean)
+        .filter(name => name !== 'DIVERTISSEMENT'); // Exclude DIVERTISSEMENT category
   const getTagNames = (tagsArr: any[]) =>
     tagsArr.map(tag => typeof tag === 'string' ? tags.find(t => t.id === tag)?.name : tag.name).filter(Boolean);
 
@@ -275,10 +277,22 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
     }
   };
 
-  // Filter parent categories (those without parentId)
+  // Filter parent categories (those without parentId) - include DIVERTISSEMENT in navigation
   const parentCategories = categories.filter(category => 
     !category.parentId // This handles null, undefined, empty string, etc.
   );
+
+  // Filter out posts that belong to DIVERTISSEMENT category
+  const postsWithoutDivertissement = posts.filter(post => {
+    if (!post.categoryIds) return true;
+    
+    return !post.categoryIds.some((catId: any) => {
+      const categoryObj = typeof catId === 'string' 
+        ? categories.find(c => c._id === catId)
+        : catId;
+      return categoryObj?.name === 'DIVERTISSEMENT';
+    });
+  });
 
   // Chunk posts for repeating structure
   const chunkSections = (arr: Post[], chunkSize: number, sliderSize: number) => {
@@ -295,23 +309,23 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
   };
 
   // Each section: 1 main, 2 small, headlines; then a slider of 4
-  const sections = chunkSections(posts, 3, 4);
+  const sections = chunkSections(postsWithoutDivertissement, 3, 4);
 
   // Helper to get sidebar headlines (next 4 posts after the 3 in section)
-  const getSidebarStories = (startIdx: number) => posts.slice(startIdx + 3, startIdx + 7);
+  const getSidebarStories = (startIdx: number) => postsWithoutDivertissement.slice(startIdx + 3, startIdx + 7);
 
   // After the first main+2+headlines+carousel, show a modern 3-column layout for the next up to 11 posts (or fewer if not enough)
   const modernStartIdx = 3 + 4; // skip first 3 (main+2) and 4 (carousel)
-  const modernPosts = posts.slice(modernStartIdx, modernStartIdx + 11); // 1+3+1+2+1+3 = 11
+  const modernPosts = postsWithoutDivertissement.slice(modernStartIdx, modernStartIdx + 11); // 1+3+1+2+1+3 = 11
   // Left: 1 large + 3 small, Center: 1 extra-large + 2 small, Right: 1 large + 3 small
   // Removed hardcoded layout variables - now using dynamic category-based content
   // Posts after the modern 3-column layout
   const afterModernIdx = modernStartIdx + modernPosts.length;
-  const remainingPosts = posts.slice(afterModernIdx);
+  const remainingPosts = postsWithoutDivertissement.slice(afterModernIdx);
 
   // Get posts for dynamic categories instead of hardcoded sections
   const getPostsForCategory = (categoryId: string, limit: number = 2) => {
-    const filteredPosts = posts.filter(post => {
+    const filteredPosts = postsWithoutDivertissement.filter(post => {
       if (!post.categoryIds) return false;
       
       // Handle both string IDs and object IDs
@@ -324,11 +338,12 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
   };
 
   // Find categories with posts for dynamic sections
-  // Find ACTUALITÉS category or use categories with posts
-  const actualitesCategory = categories.find(c => c.name.toLowerCase().includes('actualit') || c.name.toLowerCase().includes('divertissement'));
-  const firstCategory = actualitesCategory || categories.find(c => getPostsForCategory(c._id, 1).length > 0) || categories[0];
-  const secondCategory = categories.find(c => c._id !== firstCategory?._id && getPostsForCategory(c._id, 1).length > 0) || categories[1];
-  const thirdCategory = categories.find(c => c._id !== firstCategory?._id && c._id !== secondCategory?._id && getPostsForCategory(c._id, 1).length > 0) || categories[2];
+  // Filter out DIVERTISSEMENT category and find ACTUALITÉS or other suitable categories
+  const availableCategories = categories.filter(c => !c.name.toLowerCase().includes('divertissement'));
+  const actualitesCategory = availableCategories.find(c => c.name.toLowerCase().includes('actualit'));
+  const firstCategory = actualitesCategory || availableCategories.find(c => getPostsForCategory(c._id, 1).length > 0) || availableCategories[0];
+  const secondCategory = availableCategories.find(c => c._id !== firstCategory?._id && getPostsForCategory(c._id, 1).length > 0) || availableCategories[1];
+  const thirdCategory = availableCategories.find(c => c._id !== firstCategory?._id && c._id !== secondCategory?._id && getPostsForCategory(c._id, 1).length > 0) || availableCategories[2];
   const firstCategoryPosts = firstCategory ? getPostsForCategory(firstCategory._id, 5) : [];
   const secondCategoryPosts = secondCategory ? getPostsForCategory(secondCategory._id, 5) : [];
   const thirdCategoryPosts = thirdCategory ? getPostsForCategory(thirdCategory._id, 5) : [];
@@ -398,7 +413,7 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
   <nav className="mt-4 border-t border-white/20 pt-2">
     <div className="flex overflow-x-auto px-4 md:px-10 space-x-4">
       <Link href="/" className="text-sm font-medium whitespace-nowrap hover:underline text-white">
-        Tout
+        MAISON
       </Link>
       {parentCategories.map((category) => (
         <Link
@@ -672,7 +687,7 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
           <div className="border-t pt-8">
             <div className="mb-6">
               <h2 className="bg-purple-600 text-white px-4 py-2 text-sm font-bold uppercase tracking-wide inline-block">
-                {thirdCategory?.name || 'Divertissement'}
+                {thirdCategory?.name || 'Important'}
               </h2>
               {/* Dynamic subcategories based on available tags */}
               {tags.length > 0 && (

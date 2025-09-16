@@ -244,7 +244,7 @@ export function PostView({ slug: propSlug }: PostViewProps = {}) {
                         className={`px-4 py-2 rounded-md text-sm font-medium transition-colors bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800 whitespace-nowrap`}
                         onClick={() => router.push('/')}
                       >
-                        Tout
+                        MAISON
                       </button>
                     </NavigationMenuItem>
 
