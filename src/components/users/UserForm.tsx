@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -57,9 +57,9 @@ export function UserForm() {
       setError(null);
       try {
         const user = await api.get(`/users/${id}`, token || undefined);
-          setName(user.name);
-          setEmail(user.email);
-          setRole(user.role);
+        setName(user.name);
+        setEmail(user.email);
+        setRole(user.role);
         setAssignedCategoryIds(user.assignedCategoryIds || []);
         setAssignedTagIds(user.assignedTagIds || []);
       } catch (err) {
@@ -77,6 +77,7 @@ export function UserForm() {
     e.preventDefault();
     setSaving(true);
     setError(null);
+    
     if (isNewUser && password !== confirmPassword) {
       setError('Passwords do not match');
       toast({
@@ -132,10 +133,6 @@ export function UserForm() {
     }
   };
   
-  if (loading) {
-    return <div className="flex justify-center p-8">Chargement de l'utilisateur...</div>;
-  }
-  
   function buildCategoryTree(
     categories: any[],
     parentId: string | null = null
@@ -154,11 +151,15 @@ export function UserForm() {
     );
   }
   
+  if (loading) {
+    return <div className="flex justify-center p-8">Chargement de l'utilisateur...</div>;
+  }
+  
   return (
     <form onSubmit={handleSubmit}>
       <Card>
         <CardHeader>
-          <CardTitle>{isNewUser ? 'Créer un nouvel utilisateur' : 'Modifier l'utilisateur'}</CardTitle>
+          <CardTitle>{isNewUser ? 'Créer un nouvel utilisateur' : 'Modifier l\'utilisateur'}</CardTitle>
           <CardDescription>
             {isNewUser 
               ? 'Remplissez les détails pour créer un nouveau compte utilisateur' 
@@ -168,18 +169,18 @@ export function UserForm() {
         <CardContent className="p-0">
           <div className="max-h-[70vh] overflow-y-auto p-6 space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
+              <div className="text-red-500 text-sm">
                 {error}
               </div>
             )}
             
             <div className="space-y-2">
-              <Label htmlFor="name">Nom</Label>
+              <Label htmlFor="name">Nom complet</Label>
               <Input
                 id="name"
+                type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Nom complet de l'utilisateur"
                 required
               />
             </div>
@@ -191,7 +192,6 @@ export function UserForm() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="utilisateur@exemple.com"
                 required
               />
             </div>
@@ -202,15 +202,15 @@ export function UserForm() {
                 value={role}
                 onValueChange={(value) => setRole(value as UserRole)}
               >
-                <SelectTrigger id="role">
+                <SelectTrigger>
                   <SelectValue placeholder="Sélectionner un rôle" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ADMIN">Administrateur</SelectItem>
+                  <SelectItem value="USER">Utilisateur</SelectItem>
+                  <SelectItem value="AUTHOR">Auteur</SelectItem>
                   <SelectItem value="EDITOR">Éditeur</SelectItem>
                   <SelectItem value="PUBLISHER">Éditeur</SelectItem>
-                  <SelectItem value="AUTHOR">Auteur</SelectItem>
-                  <SelectItem value="USER">Utilisateur</SelectItem>
+                  <SelectItem value="ADMIN">Administrateur</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -224,7 +224,7 @@ export function UserForm() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder="Entrez le mot de passe"
                     required={isNewUser}
                   />
                 </div>
@@ -236,7 +236,7 @@ export function UserForm() {
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder="Confirmez le mot de passe"
                     required={isNewUser}
                   />
                 </div>
@@ -247,43 +247,40 @@ export function UserForm() {
             {(role === 'EDITOR' || role === 'AUTHOR' || role === 'PUBLISHER') && (
               <>
                 <div className="space-y-2">
-                  <Label>Assigner des catégories/sous-catégories</Label>
-                  <div className="border rounded-lg bg-white dark:bg-zinc-900 p-4 max-h-64 overflow-y-auto">
-                    {buildCategoryTree(categories).map(cat => (
-                      <div key={cat._id} className="mb-2">
-                        <label className="flex items-center font-semibold text-zinc-800 dark:text-zinc-100">
-                          <input
-                            type="checkbox"
-                            checked={assignedCategoryIds.includes(cat._id)}
-                            onChange={() => handleCategoryToggle(cat._id)}
-                            className="accent-indigo-500 mr-2"
-                          />
-                          {cat.name}
-                        </label>
-                        {cat.children.length > 0 && (
-                          <div className="ml-6 mt-1 space-y-1">
-                            {cat.children.map((sub: any) => (
-                              <label
-                                key={sub._id}
-                                className="flex items-center text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-800 rounded px-2 py-1"
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={assignedCategoryIds.includes(sub._id)}
-                                  onChange={() => handleCategoryToggle(sub._id)}
-                                  className="accent-indigo-500 mr-2"
-                                />
-                                {sub.name}
-                              </label>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                  <Label>Catégories assignées</Label>
+                  {buildCategoryTree(categories).map(cat => (
+                    <div key={cat._id} className="mb-2">
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={assignedCategoryIds.includes(cat._id)}
+                          onChange={() => handleCategoryToggle(cat._id)}
+                        />
+                        <span>{cat.name}</span>
+                      </label>
+                      {cat.children.length > 0 && (
+                        <div className="ml-4">
+                          {cat.children.map((sub: any) => (
+                            <label
+                              key={sub._id}
+                              className="flex items-center space-x-2 mt-1"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={assignedCategoryIds.includes(sub._id)}
+                                onChange={() => handleCategoryToggle(sub._id)}
+                              />
+                              <span>{sub.name}</span>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
+                
                 <div className="space-y-2">
-                  <Label>Assigner des tags</Label>
+                  <Label>Tags assignés</Label>
                   <MultiSelect
                     options={tags.map((tag: any) => ({ value: tag.id || tag._id, label: tag.name }))}
                     value={assignedTagIds}
@@ -296,15 +293,15 @@ export function UserForm() {
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button 
-            type="button" 
-            variant="outline" 
+          <Button
+            type="button"
+            variant="outline"
             onClick={() => router.push('/dashboard/users')}
           >
             Annuler
           </Button>
           <Button type="submit" disabled={saving}>
-            {saving ? 'Sauvegarde...' : 'Sauvegarder l'utilisateur'}
+            {saving ? 'Sauvegarde...' : 'Sauvegarder l\'utilisateur'}
           </Button>
         </CardFooter>
       </Card>
