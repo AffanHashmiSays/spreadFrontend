@@ -326,83 +326,102 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
           </header>
           {/* Category Navbar */}
           <nav className="mb-8 relative">
-            {/* Left Arrow */}
-            {showLeftArrow && (
-              <button
-                onClick={scrollLeft}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-full p-2 shadow-lg hover:shadow-xl transition-all hover:scale-105 md:hidden"
-                aria-label="Scroll left"
-              >
-                <ChevronLeft className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-              </button>
-            )}
-            
-            {/* Right Arrow */}
-            {showRightArrow && (
-              <button
-                onClick={scrollRight}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-full p-2 shadow-lg hover:shadow-xl transition-all hover:scale-105 md:hidden"
-                aria-label="Scroll right"
-              >
-                <ChevronRight className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-              </button>
-            )}
-            
-            <div 
-              ref={navRef}
-              className="overflow-x-auto scrollbar-hide px-10 md:px-2"
-              onScroll={checkScrollState}
+  {/* Left Arrow */}
+  {showLeftArrow && (
+    <button
+      onClick={scrollLeft}
+      className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-full p-2 shadow-lg hover:shadow-xl transition-all hover:scale-105 md:hidden"
+      aria-label="Scroll left"
+    >
+      <ChevronLeft className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+    </button>
+  )}
+
+  {/* Right Arrow */}
+  {showRightArrow && (
+    <button
+      onClick={scrollRight}
+      className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-full p-2 shadow-lg hover:shadow-xl transition-all hover:scale-105 md:hidden"
+      aria-label="Scroll right"
+    >
+      <ChevronRight className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+    </button>
+  )}
+
+  <div
+    ref={navRef}
+    className="overflow-x-auto scrollbar-hide px-10 md:px-2"
+    onScroll={checkScrollState}
+  >
+    <div className="flex justify-center min-w-max">
+      <NavigationMenu>
+        <NavigationMenuList className="flex-nowrap gap-2 min-w-max">
+          {/* ----------  MAISON  ---------- */}
+          <NavigationMenuItem>
+            <Link
+              href="/"
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap inline-block ${
+                !categorySlug
+                  ? 'text-white'
+                  : 'bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+              }`}
+              style={!categorySlug ? { backgroundColor: '#708238' } : {}}
+              prefetch
             >
-              <div className="flex justify-center min-w-max">
-                <NavigationMenu>
-                  <NavigationMenuList className="flex-nowrap gap-2 min-w-max">
-                    {/* All Parent Categories */}
-                    {parentCategories.map(parentCat => (
-                      <NavigationMenuItem key={parentCat._id}>
-                        <Link
-                          href={`/${parentCat.slug}`}
-                          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap inline-block ${
-                            categorySlug === parentCat.slug 
-                              ? 'text-white' 
-                              : 'bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800'
-                          }`}
-                          style={categorySlug === parentCat.slug ? {backgroundColor: '#708238'} : {}}
-                          prefetch={true}
-                        >
-                          {parentCat.name}
-                        </Link>
-                      </NavigationMenuItem>
-                    ))}
-                    
-                    {/* Separator if there are subcategories */}
-                    {subcategories.length > 0 && (
-                      <NavigationMenuItem>
-                        <span className="px-2 py-2 text-zinc-400 dark:text-zinc-600">|</span>
-                      </NavigationMenuItem>
-                    )}
-                    
-                    {/* Subcategories of current category */}
-                    {subcategories.map(subcat => (
-                      <NavigationMenuItem key={subcat._id}>
-                        <Link
-                          href={`/${category.slug}/${subcat.slug}`}
-                          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap inline-block ${
-                            subcategorySlug === subcat.slug 
-                              ? 'text-white' 
-                              : 'bg-gray-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'
-                          }`}
-                          style={subcategorySlug === subcat.slug ? {backgroundColor: '#708238'} : {}}
-                          prefetch={true}
-                        >
-                          {subcat.name}
-                        </Link>
-                      </NavigationMenuItem>
-                    ))}
-                  </NavigationMenuList>
-                </NavigationMenu>
-              </div>
-            </div>
-          </nav>
+              Maison
+            </Link>
+          </NavigationMenuItem>
+
+          {/* ----------  PARENT CATEGORIES  ---------- */}
+          {parentCategories.map(parentCat => (
+            <NavigationMenuItem key={parentCat._id}>
+              <Link
+                href={`/${parentCat.slug}`}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap inline-block ${
+                  categorySlug === parentCat.slug
+                    ? 'text-white'
+                    : 'bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                }`}
+                style={categorySlug === parentCat.slug ? { backgroundColor: '#708238' } : {}}
+                prefetch
+              >
+                {parentCat.name}
+              </Link>
+            </NavigationMenuItem>
+          ))}
+
+          {/* ----------  SEPARATOR  ---------- */}
+          {subcategories.length > 0 && (
+            <NavigationMenuItem>
+              <span className="px-2 py-2 text-zinc-400 dark:text-zinc-600">|</span>
+            </NavigationMenuItem>
+          )}
+
+          {/* ----------  SUB-CATEGORIES  ---------- */}
+          {subcategories.map(subcat => (
+            <NavigationMenuItem key={subcat._id}>
+              <Link
+                href={`/${category.slug}/${subcat.slug}`}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap inline-block ${
+                  subcategorySlug === subcat.slug
+                    ? 'text-white'
+                    : 'bg-gray-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'
+                }`}
+                style={subcategorySlug === subcat.slug ? { backgroundColor: '#708238' } : {}}
+                prefetch
+              >
+                {subcat.name}
+              </Link>
+            </NavigationMenuItem>
+          ))}
+        </NavigationMenuList>
+      </NavigationMenu>
+    </div>
+  </div>
+</nav>
+  
+                            
+    
           
           {/* Search Results Indicator */}
           {searchQuery && searchQuery.trim().length >= 2 && (

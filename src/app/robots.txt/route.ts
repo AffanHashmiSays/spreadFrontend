@@ -1,14 +1,14 @@
 export async function GET() {
   try {
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const backendUrl = 'https://be.spreadtheword.fr/';
     const response = await fetch(`${backendUrl}/robots.txt`);
-    
+
     if (!response.ok) {
       throw new Error('Failed to fetch robots.txt');
     }
-    
+
     const txt = await response.text();
-    
+
     return new Response(txt, {
       headers: {
         'Content-Type': 'text/plain',
@@ -19,4 +19,5 @@ export async function GET() {
     console.error('Error fetching robots.txt:', error);
     return new Response('Error generating robots.txt', { status: 500 });
   }
-} 
+}
+

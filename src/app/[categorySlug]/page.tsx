@@ -81,6 +81,78 @@ async function isValidPostSlug(slug: string): Promise<boolean> {
 export async function generateMetadata({ params }: DynamicPageProps): Promise<Metadata> {
   const { categorySlug } = await params;
   
+  // Hardcoded meta for 'politique' category
+  if (categorySlug === 'politique') {
+    return {
+      title: 'Politique en France – Actualités & Analyses | SpreadTheWord',
+      description: 'Suivez l’actualité politique en France : débats, réformes, élections et analyses claires. Des infos fiables et rapides sur SpreadTheWord.fr',
+      keywords: 'politique, France, actualités, débats, réformes, élections, analyses, SpreadTheWord',
+      authors: [{ name: 'Votre Entreprise' }],
+    };
+  }
+  // Hardcoded meta for 'actualites' category
+  if (categorySlug === 'actualites') {
+    return {
+      title: 'Actualités France & Monde – Infos Fiables | SpreadTheWord',
+      description: 'Suivez l’actualité en direct : politique, économie, culture, tech et société. Des infos claires, rapides et fiables sur SpreadTheWord.fr.',
+      keywords: 'actualités, France, monde, politique, économie, culture, tech, société, infos, SpreadTheWord',
+      authors: [{ name: 'Votre Entreprise' }],
+    };
+  }
+  // Hardcoded meta for 'divertissement' category
+  if (categorySlug === 'divertissement') {
+    return {
+      title: 'Divertissement – Cinéma, Musique & Culture | SpreadTheWord',
+      description: 'Découvrez l’actualité divertissement : cinéma, musique, séries, célébrités et culture pop. Tendances et infos fraîches sur SpreadTheWord.fr.',
+      keywords: 'divertissement, cinéma, musique, séries, célébrités, culture pop, tendances, infos, SpreadTheWord',
+      authors: [{ name: 'Votre Entreprise' }],
+    };
+  }
+  // Hardcoded meta for 'economie' category
+  if (categorySlug === 'economie') {
+    return {
+      title: 'Économie – Actualités & Analyses Financières | SpreadTheWord',
+      description: 'Suivez l’actualité économique en France et à l’international : marchés, entreprises, emploi et finances. Infos claires et fiables sur SpreadTheWord.fr.',
+      keywords: 'économie, actualités, analyses, finances, marchés, entreprises, emploi, France, international, SpreadTheWord',
+      authors: [{ name: 'Votre Entreprise' }],
+    };
+  }
+  // Hardcoded meta for 'monde' category
+  if (categorySlug === 'monde') {
+    return {
+      title: 'Monde – Actualités Internationales & Analyses | SpreadTheWord',
+      description: 'Suivez l’actualité internationale : politique, économie, société et culture. Analyses claires et infos fiables du monde entier sur SpreadTheWord.fr.',
+      keywords: 'monde, actualités, internationales, analyses, politique, économie, société, culture, infos, SpreadTheWord',
+      authors: [{ name: 'Votre Entreprise' }],
+    };
+  }
+  // Hardcoded meta for 'sante' category
+  if (categorySlug === 'sante') {
+    return {
+      title: 'Santé – Actualités Médicales & Bien-Être | SpreadTheWord',
+      description: 'Suivez l’actualité santé : médecine, bien-être, prévention et innovations. Infos claires et fiables pour rester informé sur SpreadTheWord.fr.',
+      keywords: 'santé, actualités, médicales, bien-être, médecine, prévention, innovations, infos, SpreadTheWord',
+      authors: [{ name: 'Votre Entreprise' }],
+    };
+  }
+  // Hardcoded meta for 'sci-tech' category
+  if (categorySlug === 'sci-tech') {
+    return {
+      title: 'Science et Technologie – Innovations & Découvertes | SpreadTheWord',
+      description: 'Suivez l’actualité science et technologie : innovations, recherche, IA, espace et tendances numériques. Infos claires et fiables sur SpreadTheWord.fr.',
+      keywords: 'science, technologie, innovations, découvertes, recherche, IA, espace, tendances numériques, infos, SpreadTheWord',
+      authors: [{ name: 'Votre Entreprise' }],
+    };
+  }
+  
+  if (categorySlug === 'sport') {
+    return {
+      title: 'Sport – Actualités & Résultats en Direct | SpreadTheWord',
+      description: 'Suivez l’actualité sportive : football, basketball, tennis, compétitions internationales et résultats en direct. Infos fiables sur SpreadTheWord.fr.',
+      keywords: 'sport, technologie, innovations, découvertes, recherche, IA, espace, tendances numériques, infos, SpreadTheWord',
+      authors: [{ name: 'Votre Entreprise' }],
+    };
+  }
   // Check if this is a category first
   const isCategory = await isValidCategorySlug(categorySlug);
   if (isCategory) {

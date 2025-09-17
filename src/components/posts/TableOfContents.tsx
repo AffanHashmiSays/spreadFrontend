@@ -273,7 +273,7 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ headings }) => {
                   : 'text-lg text-slate-700 group-hover:text-slate-800'
                 }
               `}>
-                Table of Contents
+                Table des matières
               </h2>
             </div>
             
