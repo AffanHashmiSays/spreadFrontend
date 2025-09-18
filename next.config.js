@@ -112,6 +112,35 @@ const nextConfig = {
     return config;
   },
 
+  // Redirect from /posts/{post-slug} to /{post-slug}
+  async redirects() {
+    const backendBaseUrl = 'https://be.spreadtheword.fr/api';
+    
+    try {
+      // Fetch all posts to get their slugs
+      const response = await fetch(`${backendBaseUrl}/posts?limit=1000`);
+      if (!response.ok) {
+        console.warn('Could not fetch posts for redirects, using fallback pattern');
+        return [];
+      }
+      
+      const data = await response.json();
+      const posts = data.data || [];
+      
+      // Create redirects for each post slug - redirect from /posts/{slug} to /{slug}
+      const postRedirects = posts.map((post) => ({
+        source: `/posts/${post.slug}`,
+        destination: `/${post.slug}`,
+        permanent: true, // 301 redirect
+      }));
+      
+      return postRedirects;
+    } catch (error) {
+      console.warn('Error creating post redirects:', error);
+      return [];
+    }
+  },
+
   // Rewrite backend URLs to appear as frontend URLs
   async rewrites() {
     const backendBaseUrl = 'https://be.spreadtheword.fr';

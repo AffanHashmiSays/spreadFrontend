@@ -176,6 +176,7 @@ export async function generateMetadata({ params }: DynamicPageProps): Promise<Me
     
     // Use only the environment variable, remove /api for frontend URLs
     const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api', '');
+    // Always use /{slug} structure for canonical URLs to prevent duplicate content
     const canonicalUrl = post.canonicalUrl || `${baseUrl}/${categorySlug}`;
     
     return {
@@ -218,12 +219,12 @@ export async function generateMetadata({ params }: DynamicPageProps): Promise<Me
         canonical: canonicalUrl,
       },
       
-      // Robots
+      // Robots - Allow indexing of posts from /{slug} route
       robots: {
-        index: true,
-        follow: true,
+        index: true, // Index posts from this route
+        follow: true, // Still follow links
         googleBot: {
-          index: true,
+          index: true, // Index posts from this route
           follow: true,
           'max-video-preview': -1,
           'max-image-preview': 'large' as const,
@@ -472,4 +473,4 @@ export default async function DynamicPage({ params }: DynamicPageProps) {
   
   // Neither category nor post found
   notFound();
-} 
+}

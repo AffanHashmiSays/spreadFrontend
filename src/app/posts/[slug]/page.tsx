@@ -66,6 +66,17 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
     description: metaDescription,
     keywords: metaKeywords,
     
+    // Prevent indexing of /posts/{slug} URLs - redirect to /{slug} instead
+    robots: {
+      index: false,
+      follow: false,
+      noarchive: true,
+      googleBot: {
+        index: false,
+        follow: false,
+      },
+    },
+    
     // Open Graph
     openGraph: {
       title: post.ogTitle || metaTitle,
@@ -99,19 +110,6 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
     // Additional meta tags
     alternates: {
       canonical: canonicalUrl,
-    },
-    
-    // Robots
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large' as const,
-        'max-snippet': -1,
-      },
     },
     
     // Additional meta tags using other
@@ -246,4 +244,4 @@ export default async function PostPage({ params }: PostPageProps) {
       <PostViewSSR initialData={postSSRData} />
     </>
   );
-} 
+}

@@ -51,7 +51,7 @@ export default function Footer({ categories = [], latestNews = [], footerContent
 
   return (
     <footer 
-      className="bg-[#708238] border-t border-[#708238] mt-16 min-h-[600px]" 
+      className="bg-[#708238] border-t border-[#708238] min-h-[600px]" 
       style={{ 
         contain: 'layout style',
         willChange: 'auto'
@@ -72,6 +72,7 @@ export default function Footer({ categories = [], latestNews = [], footerContent
             <Link href="/about" className="text-zinc-300 hover:text-white transition-colors duration-200">À propos</Link>
             <Link href="/pricing" className="text-zinc-300 hover:text-white transition-colors duration-200">Tarifs</Link>
             <Link href="/privacy-policy" className="text-zinc-300 hover:text-white transition-colors duration-200">Politique de confidentialité</Link>
+            <Link href="/contactus" className="text-zinc-300 hover:text-white transition-colors duration-200">Contactez-nous</Link>
           </nav>
         </div>
       </div>

@@ -43,6 +43,9 @@ export const generatePostMetadata = (postMeta: PostMetaData): Metadata => {
   // Use only the environment variable, remove /api for frontend URLs
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api', '');
   
+  // Always use /{slug} structure for canonical URLs to prevent duplicate content
+  const canonicalUrl = postMeta.canonicalUrl || `${baseUrl}/${postMeta.slug}`;
+  
   return {
     title: postMeta.metaTitle || postMeta.title,
     description: postMeta.metaDescription || postMeta.excerpt,
@@ -54,7 +57,7 @@ export const generatePostMetadata = (postMeta: PostMetaData): Metadata => {
       title: postMeta.ogTitle || postMeta.metaTitle || postMeta.title,
       description: postMeta.ogDescription || postMeta.metaDescription || postMeta.excerpt,
       type: 'article',
-      url: postMeta.canonicalUrl || `${baseUrl}/${postMeta.slug}`,
+      url: canonicalUrl,
       images: postMeta.ogImage ? [
         {
           url: postMeta.ogImage,
@@ -79,7 +82,7 @@ export const generatePostMetadata = (postMeta: PostMetaData): Metadata => {
     
     // Additional meta tags
     alternates: {
-      canonical: postMeta.canonicalUrl || `${baseUrl}/${postMeta.slug}`,
+      canonical: canonicalUrl,
     },
     
     // Robots
@@ -218,4 +221,4 @@ export const generateStructuredData = (postMeta: PostMetaData) => {
       url: baseUrl
     }
   };
-}; 
+};
