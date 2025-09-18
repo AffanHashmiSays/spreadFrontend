@@ -116,12 +116,21 @@ const nextConfig = {
   async redirects() {
     const backendBaseUrl = 'https://be.spreadtheword.fr/api';
     
+    // Static redirects
+    const staticRedirects = [
+      {
+        source: '/sitemap.xml',
+        destination: '/',
+        permanent: true, // 301 redirect
+      },
+    ];
+    
     try {
       // Fetch all posts to get their slugs
       const response = await fetch(`${backendBaseUrl}/posts?limit=1000`);
       if (!response.ok) {
         console.warn('Could not fetch posts for redirects, using fallback pattern');
-        return [];
+        return staticRedirects;
       }
       
       const data = await response.json();
@@ -134,10 +143,10 @@ const nextConfig = {
         permanent: true, // 301 redirect
       }));
       
-      return postRedirects;
+      return [...staticRedirects, ...postRedirects];
     } catch (error) {
       console.warn('Error creating post redirects:', error);
-      return [];
+      return staticRedirects;
     }
   },
 
@@ -156,11 +165,6 @@ const nextConfig = {
       {
         source: '/categories-sitemap.xml',
         destination: `${backendBaseUrl}/categories-sitemap.xml`,
-      },
-      // Legacy Sitemap rewrite - redirects to sitemap index
-      {
-        source: '/sitemap.xml',
-        destination: `${backendBaseUrl}/sitemap.xml`,
       },
       // Robots.txt rewrite - masks backend robots.txt as frontend robots.txt
       {
