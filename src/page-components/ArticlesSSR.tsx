@@ -617,16 +617,22 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
                       </div>
                     )}
                     
-                    {/* Category badge */}
-                    <div className="mb-3">
-                      {getCategoryNames(post.categoryIds).slice(0,1).map((name, index) => (
+                    {/* Tags and reading time instead of category badge */}
+                    <div className="mb-3 flex items-center gap-2 flex-wrap">
+                      {/* Show tags */}
+                      {getTagNames(post.tagIds).slice(0, 2).map((name, index) => (
                         <span 
-                          key={`section-cat-${post._id || post.id}-${name}-${index}`} 
-                          className="text-xs font-semibold px-2 py-1 rounded-sm bg-blue-600 text-white uppercase tracking-wide"
+                          key={`section-tag-${post._id || post.id}-${name}-${index}`} 
+                          className="text-xs font-medium px-2 py-1 rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
                         >
-                          {name}
+                          #{name}
                         </span>
                       ))}
+                      {/* Reading time */}
+                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        <span>⏱️</span>
+                        <span>{Math.max(1, Math.ceil(post.content?.replace(/<[^>]*>/g, '').split(' ').length / 200))} min de lecture</span>
+                      </span>
                     </div>
 
                     {/* Title and excerpt */}
@@ -721,11 +727,7 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
                   )}
                   
                   {/* Category */}
-                  <div className="mb-3">
-                    <span className="text-xs font-semibold px-2 py-1 rounded-sm bg-gray-600 text-white uppercase tracking-wide">
-                      Entertainment
-                    </span>
-                  </div>
+                 
 
                   <h3 className="text-lg font-bold leading-tight mb-2 group-hover:text-purple-600 transition-colors">
                     <Link href={`/${post.slug}`} className="hover:underline underline-offset-2">
@@ -951,21 +953,22 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
                       </div>
                     )}
                     
-                    {/* Category badge */}
-                    <div className="mb-3">
-                      {getCategoryNames(post.categoryIds).slice(0,1).map((name, index) => (
+                    {/* Tags and metadata instead of category badges */}
+                    <div className="mb-3 flex items-center gap-2 flex-wrap">
+                      {/* Show tags instead of categories */}
+                      {getTagNames(post.tagIds).slice(0, 2).map((name, index) => (
                         <span 
-                          key={`grid-cat-${post._id || post.id}-${name}-${index}`} 
-                          className={`text-xs font-semibold px-2 py-1 rounded-sm uppercase tracking-wide ${
-                            name.toLowerCase() === firstCategory?.name?.toLowerCase() ? 'bg-green-500 text-white' :
-                name.toLowerCase() === secondCategory?.name?.toLowerCase() ? 'bg-pink-500 text-white' :
-                name.toLowerCase() === initialCategories[3]?.name?.toLowerCase() ? 'bg-orange-500 text-white' :
-                            'bg-gray-600 text-white'
-                          }`}
+                          key={`grid-tag-${post._id || post.id}-${name}-${index}`} 
+                          className="text-xs font-medium px-2 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
                         >
-                          {name}
+                          #{name}
                         </span>
                       ))}
+                      {/* Reading time estimate */}
+                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        <span>📖</span>
+                        <span>{Math.max(1, Math.ceil(post.content?.replace(/<[^>]*>/g, '').split(' ').length / 200))} min</span>
+                      </span>
                     </div>
 
                     <h3 className="text-lg font-bold leading-tight mb-2 group-hover:text-blue-600 transition-colors">
@@ -1106,9 +1109,7 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
                 <div className="space-y-3">
                   {remainingPosts.slice(16, 19).map((post, index) => (
                     <div key={post._id || post.id} className="group cursor-pointer">
-                      <div className="mb-1">
-                        <span className="text-xs font-semibold text-purple-600 uppercase tracking-wide">ENTERTAINMENT</span>
-                      </div>
+                     
                       <h4 className="font-medium text-sm leading-tight line-clamp-2 group-hover:text-purple-600 transition-colors mb-1">
                         <Link href={`/${post.slug}`} className="hover:underline underline-offset-2">
                           {post.title}

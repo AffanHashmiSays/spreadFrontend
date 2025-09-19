@@ -837,8 +837,7 @@ export function PostForm({ isNewPost = false }: PostFormProps) {
                 {parentCategories.map(category => {
                 // Use _id as the category identifier
                 const categoryId = category._id || `temp-${Math.random().toString(36).substr(2, 9)}`;
-                const isChecked = selectedCategories.includes(categoryId) || 
-                                (selectedParentCategory === categoryId);
+                const isChecked = selectedCategories.includes(categoryId);
                 return (
                   <div key={`parent-${categoryId}`} className="flex items-center space-x-2">
                     <Checkbox
@@ -864,8 +863,7 @@ export function PostForm({ isNewPost = false }: PostFormProps) {
                     .map((sub, index) => {
                       // Ensure we have a valid ID for the key
                       const subId = sub?._id || `temp-sub-${index}`;
-                      const isChecked = selectedCategories.includes(subId) || 
-                                      (selectedSubCategory === subId);
+                      const isChecked = selectedCategories.includes(subId);
                       return (
                         <div key={`sub-${subId}`} className="flex items-center space-x-2 ml-4">
                           <Checkbox

@@ -368,7 +368,7 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
               style={!categorySlug ? { backgroundColor: '#708238' } : {}}
               prefetch
             >
-              Maison
+             MAISON
             </Link>
           </NavigationMenuItem>
 
@@ -601,7 +601,7 @@ export default function CategoryPageSSR({ initialData }: CategoryPageSSRProps) {
                   </div>
                   <aside className="space-y-6 md:mt-24">
                     <div className="border-b pb-4">
-                      <h3 className="font-bold mb-2 text-zinc-800 dark:text-zinc-100">Dernières nouvelles</h3>
+                      
                       <ul className="space-y-2">
                         {sidebarStories.map(post => (
                           <li key={post._id || post.id} className="flex items-center gap-4">
