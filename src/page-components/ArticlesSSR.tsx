@@ -965,10 +965,7 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
                         </span>
                       ))}
                       {/* Reading time estimate */}
-                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                        <span>📖</span>
-                        <span>{Math.max(1, Math.ceil(post.content?.replace(/<[^>]*>/g, '').split(' ').length / 200))} min</span>
-                      </span>
+                      
                     </div>
 
                     <h3 className="text-lg font-bold leading-tight mb-2 group-hover:text-blue-600 transition-colors">
@@ -979,11 +976,7 @@ export default function ArticlesSSR({ initialPosts, initialCategories, initialTa
                     
                     {/* Rating stars */}
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="flex">
-                        {Array.from({ length: 5 }, (_, i) => (
-                          <span key={`${post._id || post.id}-star-${i}`} className="text-yellow-400 text-sm">★</span>
-                        ))}
-                      </div>
+                     
                       <span className="text-xs text-gray-500">2 Min de Lecture</span>
                     </div>
                   </div>
