@@ -59,6 +59,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className="h-full w-full">
       <head>
+        <meta name="google-site-verification" content="p2CVLBzSRDAYQEZbhaphp9zE5sc-pBen67G9HhxewBU" />
         <link
           rel="preload"
           href="/_next/static/media/inter-latin-400-normal.woff2"
@@ -103,4 +104,4 @@ export default async function RootLayout({
       </body>
     </html>
   );
-} 
+}
