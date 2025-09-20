@@ -87,6 +87,8 @@ export default async function RootLayout({
           href="https://spreadtheword.fr"
           crossOrigin="anonymous"
         />
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
         <link rel="preload" href="/favicon.ico" as="image" type="image/x-icon" />
       </head>
       <body className={`${inter.className} h-full w-full m-0 p-0`}>
