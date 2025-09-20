@@ -20,6 +20,18 @@ export const metadata: Metadata = {
   description: 'Un système CRM moderne et de qualité production construit avec Next.js, React et MongoDB.',
   keywords: 'CRM, Next.js, React, MongoDB, Tableau de bord, Gestion de Contenu',
   authors: [{ name: 'Votre Entreprise' }],
+  icons: {
+    icon: [{ url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' }],
+    shortcut: '/favicon.ico',
+    apple: '/favicon.ico',
+    other: [
+      {
+        rel: 'icon',
+        type: 'image/x-icon',
+        url: '/favicon.ico',
+      },
+    ],
+  },
 };
 
 export const viewport: Viewport = {
@@ -87,9 +99,7 @@ export default async function RootLayout({
           href="https://spreadtheword.fr"
           crossOrigin="anonymous"
         />
-        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-        <link rel="preload" href="/favicon.ico" as="image" type="image/x-icon" />
+
       </head>
       <body className={`${inter.className} h-full w-full m-0 p-0`}>
         <AuthProvider>
